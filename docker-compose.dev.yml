@@ -1,0 +1,80 @@
+services:
+  api-tcc:
+    build: ./backend
+    container_name: api-tcc
+    ports:
+      - 8080:8080
+    environment:
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_PORT: ${DATABASE_PORT:-5432}
+      DATABASE_HOST: ${DATABASE_HOST_DOCKER:-db_tcc}
+    depends_on:
+      - db_tcc
+      - pgadmin
+    # networks:
+    #   - tcc_unesc
+  frontend-dev:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+      - "24678:24678"
+    volumes:
+      - ./frontend:/app
+      - ./frontend/node_modules:/app/node_modules
+    depends_on:
+      - api-tcc
+
+  code_handler:
+    build: ./code_handler
+    container_name: code_handler-api
+    ports:
+      - 8082:8082
+    volumes:
+      - codes:/codes
+    # networks:
+    #   - tcc_unesc
+
+  db_tcc:
+    image: "postgres:latest"
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    volumes:
+      - db_tcc:/var/lib/postgresql/data
+    # networks:
+    #   - tcc_unesc
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: unless-stopped
+    depends_on:
+      - db_tcc
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@admin.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-password}
+    ports:
+      - 8081:80
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+
+volumes:
+  db_tcc:
+    driver: local
+  pgadmin:
+    driver: local
+  codes:
+    driver: local
+  node_modules:
+    # driver: local
+
+# networks:
+#   tcc_unesc:
+#     driver: bridge
