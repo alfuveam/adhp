@@ -1,0 +1,24 @@
+services:
+  frontend:
+    build: ./frontend
+    image: nginx
+    ports:
+    - "8080:80"
+
+  code-handler:
+    build: ./code-handler
+    container_name: code-handler-api
+    ports:
+      - 8083:8083
+    volumes:
+      - codes:/codes
+    # networks:
+    #   - network_handler
+
+volumes:
+  codes:
+    driver: local
+
+# networks:
+#   network_handler:
+#     driver: bridge
