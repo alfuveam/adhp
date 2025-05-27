@@ -2,9 +2,9 @@ ARG NODE_VERSION=18.14.2
 
 FROM node:${NODE_VERSION}-slim as base
 
-ARG PORT=3000
+ARG PORT=5173
 
-ENV NODE_ENV=production
+# ENV NODE_ENV=production
 
 WORKDIR /app
 

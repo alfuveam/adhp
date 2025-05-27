@@ -1,38 +1,38 @@
 package controller
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
 	"net/mail"
-	"regexp"
 	"time"
 
-	"github.com/alfuveam/tcc/backend/config"
-	"github.com/alfuveam/tcc/backend/models"
+	"github.com/alfuveam/adhp/backend/config"
+	"github.com/alfuveam/adhp/backend/generated"
+	"github.com/alfuveam/adhp/backend/models"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type LoginResponse struct {
 	Message string `json:"message"`
-	Token   string `json:"token,omitempty"`
+	Token   string `json:"token"`
 }
 
 type ErrorResponseCreateAccount struct {
-	Completename string `json:"error_completename"`
-	// Cpf          string `json:"cpf"`
-	Phone           string `json:"error_phone"`
-	Email           string `json:"error_email"`
-	Password        string `json:"error_password"`
-	Country         string `json:"error_country"`
-	OnCreateAccount string `json:"error_on_create_account"`
+	Completename             string `json:"error_completename"`
+	Email                    string `json:"error_email"`
+	Password                 string `json:"error_password"`
+	RepeticaoEspacadaMinutos string `json:"error_repeticao_espacada_minutos"`
+	OnCreateAccount          string `json:"error_on_create_account"`
 }
 
 type MyCustomClaims struct {
-	User models.User
+	User *models.UserJwt
 	jwt.RegisteredClaims
 }
 
@@ -44,8 +44,8 @@ type DashboardResponse struct {
 	Name string `json:"name"`
 }
 
-func ValidateJWT(tokenString string) (models.User, bool, error) {
-	var user models.User
+func ValidateJWT(tokenString string) (models.UserJwt, bool, error) {
+	var user models.UserJwt
 	token, err := jwt.ParseWithClaims(tokenString, &MyCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(config.MySigningKey), nil
 	}, jwt.WithLeeway(5*time.Second))
@@ -53,18 +53,17 @@ func ValidateJWT(tokenString string) (models.User, bool, error) {
 		// log.Fatal(err)
 		return user, false, err
 	} else if claims, ok := token.Claims.(*MyCustomClaims); ok {
-		return claims.User, true, nil
+		return *claims.User, true, nil
 	} else {
 		// log.Fatal("unknown claims type, cannot proceed")
 		return user, false, errors.New("unknown claims type, cannot proceed")
 	}
 }
 
-func CreateAndSignJWT(user *models.User) (string, error) {
-
+func CreateAndSignJWT(userJWT *models.UserJwt) (string, error) {
 	// Create claims while leaving out some of the optional fields
 	claims := MyCustomClaims{
-		*user,
+		userJWT,
 		jwt.RegisteredClaims{
 			// Also fixed dates can be used for the NumericDate
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
@@ -76,7 +75,6 @@ func CreateAndSignJWT(user *models.User) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	ss, _ := token.SignedString([]byte(config.MySigningKey))
 	_, _, err := ValidateJWT(ss)
-
 	if err != nil {
 		log.Println("CreateAndSignJWT: ", err)
 	}
@@ -84,40 +82,22 @@ func CreateAndSignJWT(user *models.User) (string, error) {
 	return ss, nil
 }
 
-func OnLogin(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	var req models.User
+func OnLogin(w http.ResponseWriter, r *http.Request, q *generated.Queries) {
+	var req generated.User
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(ErroOnLogin{
-			Error: "Invalid request payload",
+			Error: "Requisição com payload inválido",
 		})
 		return
 	}
 
-	// userID, hasEmail, err := req.OnLoginCheckEmailAndPasswordId(db)
-	// if !hasEmail {
-	// 	res := ErroOnLogin{
-	// 		Error: err.Error(),
-	// 	}
-	// 	w.WriteHeader(http.StatusBadRequest)
-	// 	json.NewEncoder(w).Encode(res)
-	// 	return
-	// }
-
-	user, hasEmail, err := req.OnLoginCheckEmailAndPasswordUser(db)
-	if !hasEmail {
-		res := ErroOnLogin{
-			Error: err.Error(),
-		}
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(res)
-		return
-	}
+	user, err := q.OnLoginCheckEmailAndPasswordUser(context.Background(), req.Email)
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(ErroOnLogin{
-			Error: "Invalid request payload",
+			Error: "Invalid user",
 		})
 		return
 	}
@@ -125,6 +105,7 @@ func OnLogin(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(config.SaltDB+req.Password))
 
 	if err != nil {
+		log.Println("bcrypt.CompareHashAndPassword: ", err)
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(ErroOnLogin{
 			Error: "Invalid password",
@@ -132,10 +113,12 @@ func OnLogin(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	//	put no salt password in public token
-	user.Password = req.Password
+	userJWT := models.UserJwt{
+		Id:       user.ID.String(),
+		UserType: int(user.Usertype),
+	}
 
-	token, err := CreateAndSignJWT(&user)
+	token, err := CreateAndSignJWT(&userJWT)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(ErroOnLogin{
@@ -151,13 +134,20 @@ func OnLogin(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	json.NewEncoder(w).Encode(res)
 }
 
-func RegisterUser(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	var req models.User
-	var plainPassword string
+func OnLogout(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	response := map[string]string{
+		"message": "Logout successful",
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
+}
+
+func RegisterUser(w http.ResponseWriter, r *http.Request, q *generated.Queries) {
+	var req generated.User
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(ErroOnLogin{
-			Error: "Invalid request payload",
+			Error: "Requisição com payload inválido",
 		})
 		return
 	}
@@ -165,52 +155,44 @@ func RegisterUser(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var errorRes ErrorResponseCreateAccount
 	hasError := false
 	if len(req.Completename) > 50 || len(req.Completename) < 5 {
-		errorRes.Completename = "The correct size of name it's betwent 50 and 5."
-		hasError = true
-	}
-
-	// if len(req.Cpf) > 11 {
-	// 	errorRes.Cpf = "Incorrect size of cpf."
-	// 	hasError = true
-	// }
-
-	if len(req.Phone) > 50 && len(req.Phone) < 6 {
-		errorRes.Phone = "Incorrect size of phone."
-		hasError = true
-	}
-
-	sampleRegexp := regexp.MustCompile(`\d+`)
-	match := sampleRegexp.MatchString(req.Phone)
-	if !match {
-		errorRes.Phone = "Incorrect values in phone number."
+		errorRes.Completename = "O tamanho correto do nome é entre 50 e 5."
 		hasError = true
 	}
 
 	if len(req.Email) > 100 {
-		errorRes.Email = "Incorrect size of Email."
+		errorRes.Email = "Tamanho incorreto do Email."
+		hasError = true
+	}
+
+	if req.RepeticaoEspacadaMinutos == 1 { // 1 Hora
+		req.RepeticaoEspacadaMinutos = 60
+	} else if req.RepeticaoEspacadaMinutos == 2 { // 9 Horas
+		req.RepeticaoEspacadaMinutos = 60 * 9
+	} else if req.RepeticaoEspacadaMinutos == 3 { // 1 Dia
+		req.RepeticaoEspacadaMinutos = 60 * 24
+	} else if req.RepeticaoEspacadaMinutos == 4 { // 6 Dias
+		req.RepeticaoEspacadaMinutos = 60 * 24 * 6
+	} else if req.RepeticaoEspacadaMinutos == 5 { // 31 Dias
+		req.RepeticaoEspacadaMinutos = 60 * 24 * 31
+	} else {
+		errorRes.RepeticaoEspacadaMinutos = "Repetição incorreta."
 		hasError = true
 	}
 
 	if len(req.Password) > 100 || len(req.Password) < 9 {
-		errorRes.Password = "The correct size of password it's betwent 100 and 9."
+		errorRes.Password = "O tamanho correto para o password é entre 9 e 100."
 		hasError = true
 	}
 
-	plainPassword = req.Password
 	req.Password = config.SaltDB + req.Password
 	bytes, err := bcrypt.GenerateFromPassword([]byte(req.Password), 14)
 	if err != nil {
 		log.Println("bcrypt.GenerateFromPassword: %v", err)
-		errorRes.OnCreateAccount = "Error on create account contact the administrator"
+		errorRes.OnCreateAccount = "Erro ao criar a conta, entre em contato com o administrador."
 		hasError = true
 	}
 
 	req.Password = string(bytes)
-
-	if len(req.Country) != 3 {
-		errorRes.Country = "Incorrect country."
-		hasError = true
-	}
 
 	if _, err := mail.ParseAddress(req.Email); err != nil {
 		errorRes.Email = err.Error()
@@ -223,12 +205,23 @@ func RegisterUser(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	req.CreateAt = time.Now()
-	req.LastLogin = time.Now()
+	req.Createat = pgtype.Timestamp{Time: time.Now(), Valid: true}
+	req.Lastlogin = pgtype.Timestamp{Time: time.Now(), Valid: true}
 
-	if err := req.CreateUser(db); err != nil {
+	createUser := generated.CreateUserParams{
+		Completename:             req.Completename,
+		Email:                    req.Email,
+		Password:                 req.Password,
+		Createat:                 req.Createat,
+		Lastlogin:                req.Lastlogin,
+		Usertype:                 1,
+		RepeticaoEspacadaMinutos: req.RepeticaoEspacadaMinutos,
+	}
+
+	user, err := q.CreateUser(context.Background(), createUser)
+	if err != nil {
 		log.Println("req.CreateUser: %v", err)
-		errorRes.OnCreateAccount = "Error on create account contact the administrator"
+		errorRes.OnCreateAccount = "Erro ao criar a conta, entre em contato com o administrador.."
 		hasError = true
 	}
 
@@ -238,8 +231,11 @@ func RegisterUser(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	req.Password = plainPassword
-	token, err := CreateAndSignJWT(&req)
+	userJWT := models.UserJwt{
+		Id:       user.ID.String(),
+		UserType: int(user.Usertype),
+	}
+	token, err := CreateAndSignJWT(&userJWT)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(ErroOnLogin{
@@ -252,31 +248,5 @@ func RegisterUser(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		Message: "Login successful",
 		Token:   token,
 	}
-	json.NewEncoder(w).Encode(res)
-}
-
-func OnLoadDashBoard(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	user, ok := r.Context().Value(config.MySigningKey).(models.User)
-
-	if !ok {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(ErroOnLogin{
-			Error: "Invalid user ID",
-		})
-		return
-	}
-
-	// var req models.User
-	// res := LoginResponse{
-	// 	// Message: "Login successful",
-	// 	// Token:   "example_token",
-	// 	userID: userID,
-	// }
-	log.Println("show ID of user: ", user)
-
-	res := DashboardResponse{
-		Name: "Josh",
-	}
-	// json.NewEncoder(w).Encode("userID: " + userID)
 	json.NewEncoder(w).Encode(res)
 }

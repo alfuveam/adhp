@@ -1,0 +1,15 @@
+FROM golang:1.23.4-alpine
+
+WORKDIR /app
+
+COPY ./handler/go.mod ./handler/go.sum ./
+
+RUN go mod download
+
+COPY . .
+
+RUN apk add --no-cache python3 py3-pytest
+
+EXPOSE 8082
+
+CMD ["go", "run", "./handler/code_handler.go"]

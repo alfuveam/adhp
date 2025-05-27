@@ -1,0 +1,69 @@
+services:
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    image: tcc_backend
+    ports:
+      - 8080:8080
+    environment:
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_PORT: ${DATABASE_PORT:-5432}
+      DATABASE_HOST: ${DATABASE_HOST_DOCKER:-db_tcc}
+      CODE_HANDLER_API_URL: ${CODE_HANDLER_API_URL}
+      CODE_HANDLER_KEY: ${CODE_HANDLER_KEY}
+      SALTDB: ${SALTDB}
+    networks:
+      - tcc_unesc
+
+  frontend-tcc:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend-tcc
+    image: tcc_frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - tcc_unesc
+
+  code_handler:
+    build: 
+      context: ./code_handler
+      dockerfile: Dockerfile
+    container_name: code_handler
+    image: tcc_code_handler
+    ports:
+      - 8082:8082
+    environment:
+      CODE_HANDLER_KEY: ${CODE_HANDLER_KEY}
+      CODE_HANDLER_REMOVE_FILES: ${CODE_HANDLER_REMOVE_FILES}
+    volumes:
+      - codes:/codes
+    networks:
+      - tcc_unesc
+
+  nginx-tcc:
+    container_name: nginx-tcc
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    image: tcc_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - tcc_unesc
+
+volumes:
+  codes:
+    driver: local
+
+networks:
+  tcc_unesc:
+    external: true

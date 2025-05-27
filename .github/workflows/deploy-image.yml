@@ -1,0 +1,124 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
+    env:
+      DATABASE_NAME: ${{ vars.DATABASE_NAME }}
+      DATABASE_USER: ${{ vars.DATABASE_USER }}
+      DATABASE_PASSWORD: ${{ vars.DATABASE_PASSWORD }}
+      DATABASE_PORT: ${{ vars.DATABASE_PORT }}
+      DATABASE_HOST: ${{ vars.DATABASE_HOST }}
+      CODE_HANDLER_API_URL: ${{ vars.CODE_HANDLER_API_URL }}
+      CODE_HANDLER_KEY: ${{ vars.CODE_HANDLER_KEY }}
+      SALTDB: ${{ vars.SALTDB }}
+      CODE_HANDLER_REMOVE_FILES: ${{ vars.CODE_HANDLER_REMOVE_FILES }}
+
+    steps:
+      # Checkout do código
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 
+      - name: SQLC
+        uses: sqlc-dev/setup-sqlc@v3
+        with:
+          sqlc-version: '1.25.0'
+
+      #
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # Login no GitHub Container Registry
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
+
+      # Configurar variáveis de ambiente para o frontend
+      - name: Set up frontend environment variables
+        working-directory: ./frontend
+        run: |
+          echo "NUXT_PUBLIC_NUXT_API_URL=${{ vars.NUXT_PUBLIC_NUXT_API_URL }}" >> .env
+          echo "NUXT_PUBLIC_DISCENTE=${{ vars.NUXT_PUBLIC_DISCENTE }}" >> .env
+          echo "NUXT_PUBLIC_DOCENTE=${{ vars.NUXT_PUBLIC_DOCENTE }}" >> .env
+          echo "NUXT_USE_MONACO_EDITOR=${{ vars.NUXT_USE_MONACO_EDITOR }}" >> .env
+
+      # Gerar arquivos via sqlc
+      - name: Set up backend
+        working-directory: ./backend
+        run: |
+          sqlc generate
+          
+
+      # Construir as imagens Docker usando docker-compose
+      - name: Build Docker images with docker-compose
+        run: |
+          docker compose -f compose.yml build
+
+      # Publicar as imagens Docker no GitHub Packages
+      - name: Push Docker images to GitHub Packages
+        run: |
+          # Obtém o hash do commit
+          COMMIT_HASH=${{ github.sha }}
+
+          # Tag e push da imagem do backend
+          BACKEND_IMAGE=ghcr.io/${{ github.repository }}/backend:$COMMIT_HASH
+          docker tag tcc_backend $BACKEND_IMAGE
+          docker push $BACKEND_IMAGE
+          echo "Pushed $BACKEND_IMAGE"
+
+          BACKEND_IMAGE_LATEST=ghcr.io/${{ github.repository }}/backend:latest
+          docker tag tcc_backend $BACKEND_IMAGE_LATEST
+          docker push $BACKEND_IMAGE_LATEST
+          echo "Pushed $BACKEND_IMAGE_LATEST"
+
+          # Tag e push da imagem do frontend
+          FRONTEND_IMAGE=ghcr.io/${{ github.repository }}/frontend:$COMMIT_HASH
+          docker tag tcc_frontend $FRONTEND_IMAGE
+          docker push $FRONTEND_IMAGE
+          echo "Pushed $FRONTEND_IMAGE"
+
+          FRONTEND_LATEST=ghcr.io/${{ github.repository }}/frontend:latest
+          docker tag tcc_frontend $FRONTEND_LATEST
+          docker push $FRONTEND_LATEST
+          echo "Pushed $FRONTEND_LATEST"
+
+          # Tag e push da imagem do code_handler
+          CODE_HANDLER_IMAGE=ghcr.io/${{ github.repository }}/code_handler:$COMMIT_HASH
+          docker tag tcc_code_handler $CODE_HANDLER_IMAGE
+          docker push $CODE_HANDLER_IMAGE
+          echo "Pushed $CODE_HANDLER_IMAGE"
+
+          CODE_HANDLER_LATEST=ghcr.io/${{ github.repository }}/code_handler:latest
+          docker tag tcc_code_handler $CODE_HANDLER_LATEST
+          docker push $CODE_HANDLER_LATEST
+          echo "Pushed $CODE_HANDLER_LATEST"
+
+          NGINX_IMAGE=ghcr.io/${{ github.repository }}/nginx:$COMMIT_HASH
+          docker tag tcc_nginx $NGINX_IMAGE
+          docker push $NGINX_IMAGE
+          echo "Pushed $NGINX_IMAGE"
+
+          NGINX_IMAGE_LATEST=ghcr.io/${{ github.repository }}/nginx:latest
+          docker tag tcc_nginx $NGINX_IMAGE_LATEST
+          docker push $NGINX_IMAGE_LATEST
+          echo "Pushed $NGINX_IMAGE_LATEST"

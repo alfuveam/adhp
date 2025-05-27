@@ -1,0 +1,20 @@
+# Use the official Golang image
+FROM golang:1.23.4-alpine
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy go.mod and go.sum files first to leverage Docker cache
+COPY go.mod go.sum ./
+
+# Download dependencies
+RUN go mod download
+
+# Copy the rest of the application code
+COPY . .
+
+# Expose the port your application will run on
+EXPOSE 8080
+
+# Command to run your application
+CMD ["go", "run", "./cmd/tcc.go"]

@@ -1,25 +1,37 @@
 package main
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
 	"log"
 
-	"github.com/alfuveam/tcc/backend/config"
-	"github.com/alfuveam/tcc/backend/internal"
-	_ "github.com/lib/pq"
+	"github.com/alfuveam/adhp/backend/config"
+	"github.com/alfuveam/adhp/backend/generated"
+	"github.com/alfuveam/adhp/backend/internal"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func main() {
-	connStr := "postgres://" + config.DatabaseUser + ":" + config.DatabasePassword + "@localhost/" + config.DatabaseName + "?sslmode=disable" //verify-full
-	// connStr := "postgres://" + config.DatabaseUser + ":" + config.DatabasePassword + "@db/" + config.DatabaseName + "?sslmode=disable" //verify-full
-	fmt.Println("connStr: %v", connStr)
-	db, err := sql.Open("postgres", connStr)
+	ctx := context.Background()
+	pool, err := pgxpool.New(ctx, fmt.Sprintf(
+		"user=%s password=%s host=%s port=%s dbname=%s",
+		config.DatabaseUser,
+		config.DatabasePassword,
+		config.DatabaseHost,
+		config.DatabasePort,
+		config.DatabaseName,
+	))
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	server := internal.NewAPIServer(":8080")
-	server.Run(db)
+	defer pool.Close()
+
+	if err := pool.Ping(ctx); err != nil {
+		panic(err)
+	}
+
+	server := internal.NewAPIServer(":8080", generated.New(pool))
+	server.Run()
 }
