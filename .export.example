@@ -1,0 +1,18 @@
+#Se o pgadmin/banco de dados estiverem executando no docker, 
+#preste atenção pois é necessario utilizar do container. Ex: db_tcc
+export DATABASE_HOST="db_tcc"
+export DATABASE_PORT="5432"
+export DATABASE_NAME="tcc_ead"
+export DATABASE_USER="user_admin"
+export DATABASE_PASSWORD="db_tcc"
+export SALTDB="change_to_random_hash"
+export CODE_HANDLER_API_URL="http://code_handler:8082"
+export CODE_HANDLER_KEY="change_to_random_hash"
+export CODE_HANDLER_REMOVE_FILES="false"
+export USE_MONACO_EDITOR=false
+
+export PGADMIN_DEFAULT_EMAIL="admin@admin.com"
+export PGADMIN_DEFAULT_PASSWORD="password"
+
+#outside
+export DATABASE_HOST="localhost"

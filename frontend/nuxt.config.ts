@@ -59,7 +59,6 @@ export default defineNuxtConfig({
       allowedHosts: [
         'localhost',
         '127.0.0.1',
-        'tccfelipe.ddns.net',
         '10.0.0.156',
         'tcc.rest',
         'tcc.com.br',

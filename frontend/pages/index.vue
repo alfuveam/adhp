@@ -14,8 +14,7 @@
     <div class="bg-zinc-800 grid justify-items-center w-5/5 h-96 md:w-5/5 md:h-96 lg:mb-96 2xl:mb-0 rounded space-y-0.2 p-28 grow overflow-y-auto ml-0 md:ml-2 lg:ml-2 my-2 md:my-0 lg:my-0">
       <p class="text-white text-center justify">
         Bem Vindo! <br>
-        Essa ferramenta tem a função de ajudar o instrutor, retirando o trabalho repetitivo de corrigir questões de programação de alunos que estão iniciando na área de programação.
-        Além de ajudar os alunos com a utilização de feedback automatizado para realizar o termino do exercicios de forma mais eficaz.
+        Essa ferramenta tem a função de ajudar o instrutor, retirando o trabalho repetitivo de corrigir questões de programação de alunos que estão iniciando na área de programação. Além de ajudar os alunos com a utilização de feedback automatizado para realizar o termino dos exercicios de forma mais eficaz, sendo então explorado o uso da repetição espaçada.
       </p>
     </div>
   </div>
