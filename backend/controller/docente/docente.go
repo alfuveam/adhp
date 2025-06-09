@@ -39,6 +39,7 @@ func AddTrilha(w http.ResponseWriter, r *http.Request, q *generated.Queries) {
 	_, err = q.CreateTrilha(context.Background(), generated.CreateTrilhaParams{
 		Name:            req.Name,
 		CreatedByUserID: uuidUser,
+		TipoDaLinguagem: req.TipoDaLinguagem,
 		CreateAt:        pgtype.Timestamp{Time: time.Now(), Valid: true},
 		UpdateAt:        pgtype.Timestamp{Time: time.Now(), Valid: true},
 	})
