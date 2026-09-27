@@ -94,10 +94,10 @@ Pronto as tabelas são criadas usando o gerenciador de migração Goose.
 
 # Go
 
-module tcc_ead/sum go 1.23.0
+module adhp_ead/sum go 1.23.0
 ```
 // go.mod
-module tcc_ead/sum
+module adhp_ead/sum
 
 go 1.23.0
 ```

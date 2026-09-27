@@ -32,6 +32,13 @@ func main() {
 		panic(err)
 	}
 
-	server := internal.NewAPIServer(":8080", generated.New(pool))
+	port := config.Port
+	if port == "" {
+		port = ":8301"
+	} else if port[0] != ':' {
+		port = ":" + port
+	}
+
+	server := internal.NewAPIServer(port, generated.New(pool))
 	server.Run()
 }

@@ -4,8 +4,8 @@
       <div class="w-full h-14 bg-zinc-950">
         <div class="p-1 flex justify-between">
           <NuxtLink to="/" class="flex flex-center">
-            <img src="~/assets/images/logo_tcc.webp" class="h-12 w-12" alt="">
-            <span class="justify-center text-3xl font-bold text-gray-300 p-1">TCC</span>
+            <img src="~/assets/images/logo_adhp.webp" class="h-12 w-12 rounded-lg object-cover" alt="ADHP Logo">
+            <span class="justify-center text-3xl font-bold text-gray-300 p-1">ADHP</span>
           </NuxtLink>
           <div></div>
           <div v-if="!isAuthenticated" class="flex flex-center justify-between p-3">
@@ -34,7 +34,7 @@
             </div>
         </div>
         <hr class="ml-4 mr-4 border-gray-600"/>
-        <div class="flex justify-center mt-2">TCC - Todos os direitos reservados</div>
+        <div class="flex justify-center mt-2">ADHP - Todos os direitos reservados</div>
       </div>
     </footer>
   </div>

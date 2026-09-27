@@ -5,26 +5,28 @@ import Aura from "@primevue/themes/aura";
 export default defineNuxtConfig({
   app: {
     head: {
-      title: 'TCC Felipe 2025', // Default title for all pages
+      title: 'ADHP: AMBIENTE PARA O DESENVOLVIMENTO DE HABILIDADES EM PROGRAMAÇÃO', // Default title for all pages
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1.0' },
         // { name: 'description', content: t('footer.left_text_one') },
         { name: 'google-site-verification', content: '' },
-        { property: 'og:title', content: 'TCC Felipe 2025' },
+        { property: 'og:title', content: 'ADHP: AMBIENTE PARA O DESENVOLVIMENTO DE HABILIDADES EM PROGRAMAÇÃO' },
         { property: 'og:url', content: import.meta.env.NUXT_PUBLIC_SITE_URL },
-        { property: 'og:image', content: import.meta.env.NUXT_PUBLIC_SITE_URL + '/assets/tcc_256x256.webp' },
+        { property: 'og:image', content: import.meta.env.NUXT_PUBLIC_SITE_URL + '/assets/adhp_256x256.webp' },
         { property: 'og:type', content: 'website' },
-        { property: 'og:site_name', content: 'TCC Felipe 2025' },
+        { property: 'og:site_name', content: 'ADHP: AMBIENTE PARA O DESENVOLVIMENTO DE HABILIDADES EM PROGRAMAÇÃO' },
         { name: 'twitter:card', content: 'summary_large_image' },
         { name: 'twitter:site', content: import.meta.env.NUXT_PUBLIC_SITE_URL },
-        { name: 'twitter:title', content: 'TCC Felipe 2025' },
+        { name: 'twitter:title', content: 'ADHP: AMBIENTE PARA O DESENVOLVIMENTO DE HABILIDADES EM PROGRAMAÇÃO' },
         // { name: 'twitter:description', content: t('footer.left_text_one') },
-        { name: 'twitter:image', content: import.meta.env.NUXT_PUBLIC_SITE_URL + '/assets/tcc_256x256.webp' },
-        { name: 'keywords', content: 'tcc, tcc 2025, golang, python'}
+        { name: 'twitter:image', content: import.meta.env.NUXT_PUBLIC_SITE_URL + '/assets/adhp_256x256.webp' },
+        { name: 'keywords', content: 'adhp, golang, python' }
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+        { rel: 'icon', type: 'image/png', href: '/favicon.png' },
+        { rel: 'apple-touch-icon', href: '/favicon.png' },
       ],
     },
   },
@@ -68,10 +70,10 @@ export default defineNuxtConfig({
 
   primevue: {
     options: {
-        theme: {
-            preset: Aura,
-        },
-        ripple: true,
+      theme: {
+        preset: Aura,
+      },
+      ripple: true,
     },
     autoImport: true,
   },

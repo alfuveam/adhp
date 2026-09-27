@@ -8,14 +8,14 @@ RUN go mod download && go mod verify
 
 COPY . .
 
-RUN go build -o /bin/tcc ./cmd/tcc.go
+RUN go build -o /bin/adhp ./cmd/adhp.go
 
 FROM scratch
 
 WORKDIR /app
 
-COPY --from=builder /bin/tcc .
+COPY --from=builder /bin/adhp .
 
-EXPOSE 8080
+EXPOSE 8301
 
-ENTRYPOINT ["./tcc"]
+ENTRYPOINT ["./adhp"]

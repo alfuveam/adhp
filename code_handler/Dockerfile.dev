@@ -10,6 +10,6 @@ COPY . .
 
 RUN apk add --no-cache python3 py3-pytest
 
-EXPOSE 8082
+EXPOSE 8302
 
 CMD ["go", "run", "./handler/code_handler.go"]

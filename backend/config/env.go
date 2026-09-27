@@ -15,4 +15,5 @@ var (
 	SaltDB            = os.Getenv("SALTDB")
 	CodeHandlerApiUrl = os.Getenv("CODE_HANDLER_API_URL")
 	CodeHandlerKey    = os.Getenv("CODE_HANDLER_KEY")
+	CorsOrigin        = os.Getenv("CORS_ORIGIN")
 )

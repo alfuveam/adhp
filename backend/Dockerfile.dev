@@ -14,7 +14,7 @@ RUN go mod download
 COPY . .
 
 # Expose the port your application will run on
-EXPOSE 8080
+EXPOSE 8301
 
 # Command to run your application
-CMD ["go", "run", "./cmd/tcc.go"]
+CMD ["go", "run", "./cmd/adhp.go"]

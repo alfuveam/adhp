@@ -21,6 +21,6 @@ COPY --from=builder /bin/code_handler .
 RUN apk add --no-cache python3 py3-pytest
 ENV PATH=$PATH:/usr/local/go/bin
 
-EXPOSE 8082
+EXPOSE 8302
 
 ENTRYPOINT ["./code_handler"]

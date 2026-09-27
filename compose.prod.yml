@@ -3,7 +3,7 @@ version: '3.8'
 services:
   backend:
     image: ghcr.io/alfuveam/adhp/backend:latest
-    container_name: backend
+    container_name: backend-adhp
     environment:
       DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_USER: ${DATABASE_USER}
@@ -13,27 +13,21 @@ services:
       CODE_HANDLER_API_URL: ${CODE_HANDLER_API_URL}
       CODE_HANDLER_KEY: ${CODE_HANDLER_KEY}
       SALTDB: ${SALTDB}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
     ports:
-      - "8080:8080"
+      - "8301:8301"
 
-  frontend-tcc:
+  frontend-adhp:
     image: ghcr.io/alfuveam/adhp/frontend:latest
-    container_name: frontend-tcc
+    container_name: frontend-adhp
     ports:
-      - "5173:5173"
+      - "5190:5190"
 
   code_handler:
     image: ghcr.io/alfuveam/adhp/code_handler:latest
-    container_name: code_handler
+    container_name: code-handler-adhp
     environment:
       CODE_HANDLER_KEY: ${CODE_HANDLER_KEY}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
     ports:
-      - 8082:8082
-
-  nginx-tcc:
-    image: ghcr.io/alfuveam/adhp/nginx:latest
-    container_name: nginx-tcc
-    ports:
-      - "80:80"
-    depends_on:
-      - frontend-tcc
+      - "8302:8302"

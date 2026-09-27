@@ -15,6 +15,7 @@ import (
 var (
 	codeHandlerKey         = os.Getenv("CODE_HANDLER_KEY")
 	codeHandlerRemoveFiles = bool(os.Getenv("CODE_HANDLER_REMOVE_FILES") == "true")
+	corsOrigin             = os.Getenv("CORS_ORIGIN")
 )
 
 type CodePayload struct {
@@ -65,11 +66,11 @@ func main() {
 	)
 
 	server := http.Server{
-		Addr:    ":8082",
+		Addr:    ":8302",
 		Handler: defaultMiddlewareChain(router),
 	}
 
-	log.Println("Server started on port 8082")
+	log.Println("Server started on port 8302")
 	if err := server.ListenAndServe(); err != nil {
 		log.Println("Error on start server:", err)
 	}
@@ -218,7 +219,7 @@ func runTestGolang(w http.ResponseWriter, r *http.Request) {
 
 	fileNameGoMod := "go.mod"
 	filePathGoMod := filepath.Join(folderHandler, fileNameGoMod)
-	err = os.WriteFile(filePathGoMod, []byte(`module tcc_ead/codes
+	err = os.WriteFile(filePathGoMod, []byte(`module adhp_ead/codes
 
 go 1.23.4
 	`), 0644)
@@ -348,7 +349,12 @@ func RequestLoggerMiddleware(next http.Handler) http.HandlerFunc {
 
 func CorsMiddleware(next http.Handler) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+		origin := corsOrigin
+		if origin == "" {
+			origin = "*"
+		}
+
+		w.Header().Set("Access-Control-Allow-Origin", origin)
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
@@ -360,7 +366,7 @@ func CorsMiddleware(next http.Handler) http.HandlerFunc {
 		}
 
 		//	only return json
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Origin", origin)
 		w.Header().Set("Content-Type", "application/json")
 
 		// Chame o próximo handler

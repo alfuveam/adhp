@@ -1,35 +1,36 @@
 services:
   backend:
-    build: 
+    build:
       context: ./backend
       dockerfile: Dockerfile.dev
-    container_name: backend
-    image: tcc_backend
+    container_name: backend-adhp
+    image: adhp_backend
     ports:
-      - 8080:8080
+      - 8301:8301
     environment:
       DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_USER: ${DATABASE_USER}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      DATABASE_PORT: ${DATABASE_PORT:-5432}
-      DATABASE_HOST: ${DATABASE_HOST:-db_tcc}
+      DATABASE_PORT: ${DATABASE_PORT:-5439}
+      DATABASE_HOST: ${DATABASE_HOST:-db_adhp}
       CODE_HANDLER_API_URL: ${CODE_HANDLER_API_URL}
       CODE_HANDLER_KEY: ${CODE_HANDLER_KEY}
       SALTDB: ${SALTDB}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
     depends_on:
-      - db_tcc
+      - db_adhp
       - pgadmin
     networks:
-      - tcc_unesc
+      - adhp
 
-  frontend-tcc:
+  frontend-adhp:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
-    container_name: frontend-tcc
-    image: tcc_frontend
+    container_name: frontend-adhp
+    image: adhp_frontend
     ports:
-      - "5173:5173"
+      - "5190:5190"
       - "24678:24678"
     volumes:
       - ./frontend:/app
@@ -37,75 +38,63 @@ services:
     depends_on:
       - backend
     networks:
-      - tcc_unesc
+      - adhp
 
   code_handler:
-    build: 
+    build:
       context: ./code_handler
       dockerfile: Dockerfile.dev
-    container_name: code_handler
-    image: tcc_code_handler
+    container_name: code-handler-adhp
+    image: adhp_code_handler
     ports:
-      - 8082:8082
+      - 8302:8302
     environment:
       CODE_HANDLER_KEY: ${CODE_HANDLER_KEY}
       CODE_HANDLER_REMOVE_FILES: ${CODE_HANDLER_REMOVE_FILES}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
     volumes:
       - codes:/codes
     networks:
-      - tcc_unesc
+      - adhp
 
-  db_tcc:
+  db_adhp:
     image: "postgres:latest"
     restart: unless-stopped
     ports:
-      - 5432:5432
+      - 5439:5432
     environment:
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_DB: ${DATABASE_NAME}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
     volumes:
-      - db_tcc:/var/lib/postgresql/data
+      - db_adhp:/var/lib/postgresql/data
     networks:
-      - tcc_unesc
+      - adhp
 
   pgadmin:
     image: dpage/pgadmin4:latest
+    container_name: pgadmin-adhp
     restart: unless-stopped
     depends_on:
-      - db_tcc
+      - db_adhp
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
     ports:
-      - 8081:80
+      - 8381:80
     volumes:
       - pgadmin:/var/lib/pgadmin
     networks:
-      - tcc_unesc
-
-  nginx-tcc:
-    container_name: nginx-tcc
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile.dev
-    image: tcc_nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    networks:
-      - tcc_unesc
+      - adhp
 
 volumes:
-  db_tcc:
+  db_adhp:
     driver: local
   pgadmin:
     driver: local
   codes:
     driver: local
-  node_modules:
-    # driver: local
 
 networks:
-  tcc_unesc:
+  adhp:
     external: true

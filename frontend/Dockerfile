@@ -2,7 +2,7 @@ ARG NODE_VERSION=18.14.2
 
 FROM node:${NODE_VERSION}-slim as base
 
-ARG PORT=5173
+ARG PORT=5190
 
 # ENV NODE_ENV=production
 

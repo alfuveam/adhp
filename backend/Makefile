@@ -1,11 +1,11 @@
 build:
-	@go build -o bin/tcc cmd/main.go
+	@go build -o bin/adhp cmd/main.go
 
 test:
 	@go test -v ./...
 
 run: build
-	@./bin/tcc
+	@./bin/adhp
 
 db-version:
 	@goose --version

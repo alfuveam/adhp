@@ -27,6 +27,7 @@ jobs:
       CODE_HANDLER_KEY: ${{ vars.CODE_HANDLER_KEY }}
       SALTDB: ${{ vars.SALTDB }}
       CODE_HANDLER_REMOVE_FILES: ${{ vars.CODE_HANDLER_REMOVE_FILES }}
+      CORS_ORIGIN: ${{ vars.CORS_ORIGIN }}
 
     steps:
       # Checkout do código
@@ -82,43 +83,33 @@ jobs:
 
           # Tag e push da imagem do backend
           BACKEND_IMAGE=ghcr.io/${{ github.repository }}/backend:$COMMIT_HASH
-          docker tag tcc_backend $BACKEND_IMAGE
+          docker tag adhp_backend $BACKEND_IMAGE
           docker push $BACKEND_IMAGE
           echo "Pushed $BACKEND_IMAGE"
 
           BACKEND_IMAGE_LATEST=ghcr.io/${{ github.repository }}/backend:latest
-          docker tag tcc_backend $BACKEND_IMAGE_LATEST
+          docker tag adhp_backend $BACKEND_IMAGE_LATEST
           docker push $BACKEND_IMAGE_LATEST
           echo "Pushed $BACKEND_IMAGE_LATEST"
 
           # Tag e push da imagem do frontend
           FRONTEND_IMAGE=ghcr.io/${{ github.repository }}/frontend:$COMMIT_HASH
-          docker tag tcc_frontend $FRONTEND_IMAGE
+          docker tag adhp_frontend $FRONTEND_IMAGE
           docker push $FRONTEND_IMAGE
           echo "Pushed $FRONTEND_IMAGE"
 
           FRONTEND_LATEST=ghcr.io/${{ github.repository }}/frontend:latest
-          docker tag tcc_frontend $FRONTEND_LATEST
+          docker tag adhp_frontend $FRONTEND_LATEST
           docker push $FRONTEND_LATEST
           echo "Pushed $FRONTEND_LATEST"
 
           # Tag e push da imagem do code_handler
           CODE_HANDLER_IMAGE=ghcr.io/${{ github.repository }}/code_handler:$COMMIT_HASH
-          docker tag tcc_code_handler $CODE_HANDLER_IMAGE
+          docker tag adhp_code_handler $CODE_HANDLER_IMAGE
           docker push $CODE_HANDLER_IMAGE
           echo "Pushed $CODE_HANDLER_IMAGE"
 
           CODE_HANDLER_LATEST=ghcr.io/${{ github.repository }}/code_handler:latest
-          docker tag tcc_code_handler $CODE_HANDLER_LATEST
+          docker tag adhp_code_handler $CODE_HANDLER_LATEST
           docker push $CODE_HANDLER_LATEST
           echo "Pushed $CODE_HANDLER_LATEST"
-
-          NGINX_IMAGE=ghcr.io/${{ github.repository }}/nginx:$COMMIT_HASH
-          docker tag tcc_nginx $NGINX_IMAGE
-          docker push $NGINX_IMAGE
-          echo "Pushed $NGINX_IMAGE"
-
-          NGINX_IMAGE_LATEST=ghcr.io/${{ github.repository }}/nginx:latest
-          docker tag tcc_nginx $NGINX_IMAGE_LATEST
-          docker push $NGINX_IMAGE_LATEST
-          echo "Pushed $NGINX_IMAGE_LATEST"
