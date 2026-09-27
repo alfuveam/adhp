@@ -231,14 +231,34 @@ func RequireAuthMiddleware(next http.Handler) http.HandlerFunc {
 	}
 }
 
+// allowedOrigin devolve o valor de Access-Control-Allow-Origin para a requisição.
+// CORS_ORIGIN aceita "*" (ou vazio) ou uma lista de origens separadas por vírgula,
+// ex: "https://adhp.space,http://localhost:5190". O header só aceita UMA origem,
+// então a origem da requisição é devolvida quando estiver na lista.
+func allowedOrigin(corsOrigin, requestOrigin string) string {
+	corsOrigin = strings.TrimSpace(corsOrigin)
+	if corsOrigin == "" || corsOrigin == "*" {
+		// "*" não é aceito pelo navegador junto com Allow-Credentials
+		if requestOrigin != "" {
+			return requestOrigin
+		}
+		return "*"
+	}
+	for _, o := range strings.Split(corsOrigin, ",") {
+		if strings.TrimRight(strings.TrimSpace(o), "/") == requestOrigin {
+			return requestOrigin
+		}
+	}
+	return ""
+}
+
 func CorsMiddleware(next http.Handler) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		origin := config.CorsOrigin
-		if origin == "" {
-			origin = "*"
+		origin := allowedOrigin(config.CorsOrigin, r.Header.Get("Origin"))
+		w.Header().Add("Vary", "Origin")
+		if origin != "" {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
 		}
-
-		w.Header().Set("Access-Control-Allow-Origin", origin)
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
@@ -250,7 +270,6 @@ func CorsMiddleware(next http.Handler) http.HandlerFunc {
 		}
 
 		//	only return json
-		w.Header().Set("Access-Control-Allow-Origin", origin)
 		w.Header().Set("Content-Type", "application/json")
 
 		// Chame o próximo handler

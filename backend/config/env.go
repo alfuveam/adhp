@@ -11,7 +11,7 @@ var (
 	DatabaseName      = os.Getenv("DATABASE_NAME")
 	DatabaseUser      = os.Getenv("DATABASE_USER")
 	DatabasePassword  = os.Getenv("DATABASE_PASSWORD")
-	MySigningKey      = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+	MySigningKey      = os.Getenv("MY_SIGNING_KEY")
 	SaltDB            = os.Getenv("SALTDB")
 	CodeHandlerApiUrl = os.Getenv("CODE_HANDLER_API_URL")
 	CodeHandlerKey    = os.Getenv("CODE_HANDLER_KEY")

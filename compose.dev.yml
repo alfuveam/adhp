@@ -11,12 +11,14 @@ services:
       DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_USER: ${DATABASE_USER}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      DATABASE_PORT: ${DATABASE_PORT:-5439}
-      DATABASE_HOST: ${DATABASE_HOST:-db_adhp}
-      CODE_HANDLER_API_URL: ${CODE_HANDLER_API_URL}
+      # porta/host da rede interna do docker (5439 é só o mapeamento no host)
+      DATABASE_PORT: 5432
+      DATABASE_HOST: db_adhp
+      CODE_HANDLER_API_URL: http://code_handler:8302
       CODE_HANDLER_KEY: ${CODE_HANDLER_KEY}
       SALTDB: ${SALTDB}
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      MY_SIGNING_KEY: ${MY_SIGNING_KEY}
     depends_on:
       - db_adhp
       - pgadmin
@@ -32,9 +34,11 @@ services:
     ports:
       - "5190:5190"
       - "24678:24678"
+    environment:
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
     volumes:
       - ./frontend:/app
-      - ./frontend/node_modules:/app/node_modules
+      - /app/node_modules
     depends_on:
       - backend
     networks:

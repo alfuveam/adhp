@@ -14,6 +14,7 @@ services:
       CODE_HANDLER_KEY: ${CODE_HANDLER_KEY}
       SALTDB: ${SALTDB}
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      MY_SIGNING_KEY: ${MY_SIGNING_KEY}
     ports:
       - "8301:8301"
 
@@ -22,6 +23,8 @@ services:
     container_name: frontend-adhp
     ports:
       - "5190:5190"
+    environment:
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
 
   code_handler:
     image: ghcr.io/alfuveam/adhp/code_handler:latest

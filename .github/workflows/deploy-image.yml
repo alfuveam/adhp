@@ -28,6 +28,7 @@ jobs:
       SALTDB: ${{ vars.SALTDB }}
       CODE_HANDLER_REMOVE_FILES: ${{ vars.CODE_HANDLER_REMOVE_FILES }}
       CORS_ORIGIN: ${{ vars.CORS_ORIGIN }}
+      MY_SIGNING_KEY: ${{ secrets.MY_SIGNING_KEY || vars.MY_SIGNING_KEY }}
 
     steps:
       # Checkout do código

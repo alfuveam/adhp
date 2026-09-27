@@ -17,6 +17,7 @@ services:
       CODE_HANDLER_KEY: ${CODE_HANDLER_KEY}
       SALTDB: ${SALTDB}
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      MY_SIGNING_KEY: ${MY_SIGNING_KEY}
     networks:
       - adhp
 
@@ -28,6 +29,8 @@ services:
     image: adhp_frontend
     ports:
       - "5190:5190"
+    environment:
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
     depends_on:
       - backend
     networks:

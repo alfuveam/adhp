@@ -10,7 +10,9 @@ export CODE_HANDLER_API_URL="http://code_handler:8302"
 export CODE_HANDLER_KEY="change_to_random_hash"
 export CODE_HANDLER_REMOVE_FILES="false"
 export USE_MONACO_EDITOR=false
+# lista de origens completas (com http/https e porta), separadas por vírgula; "*" libera tudo
 export CORS_ORIGIN="*"
+export MY_SIGNING_KEY="change_to_random_secret_hash"
 
 export PGADMIN_DEFAULT_EMAIL="admin@admin.com"
 export PGADMIN_DEFAULT_PASSWORD="password"

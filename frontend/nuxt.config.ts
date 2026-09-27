@@ -58,13 +58,13 @@ export default defineNuxtConfig({
 
   vite: {
     server: {
-      allowedHosts: [
-        'localhost',
-        '127.0.0.1',
-        '10.0.0.156',
-        'tcc.rest',
-        'tcc.com.br',
-      ],
+      // hostnames derivados das origens do CORS_ORIGIN ("*" ou vazio libera tudo)
+      allowedHosts: process.env.CORS_ORIGIN && process.env.CORS_ORIGIN.trim() !== '*'
+        ? process.env.CORS_ORIGIN.split(',').map((o) => {
+            o = o.trim();
+            try { return new URL(o).hostname; } catch { return o; }
+          })
+        : true,
     },
   },
 

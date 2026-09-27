@@ -1,20 +1,19 @@
-# Use the official Golang image
 FROM golang:1.23.4-alpine
 
-# Set the working directory inside the container
+RUN apk add --no-cache make git
+
+# Install Air for hot reloading
+RUN go install github.com/air-verse/air@v1.61.7
+
 WORKDIR /app
 
 # Copy go.mod and go.sum files first to leverage Docker cache
 COPY go.mod go.sum ./
-
-# Download dependencies
 RUN go mod download
 
 # Copy the rest of the application code
 COPY . .
 
-# Expose the port your application will run on
 EXPOSE 8301
 
-# Command to run your application
-CMD ["go", "run", "./cmd/adhp.go"]
+CMD ["air"]
