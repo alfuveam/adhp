@@ -39,6 +39,10 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
+    # nitro deixa sockets worker-<pid>-1.sock em /tmp/nitro; no restart o PID se repete,
+    # o listen dá EADDRINUSE e toda página fica pendurada. tmpfs zera o /tmp a cada start.
+    tmpfs:
+      - /tmp
     depends_on:
       - backend
     networks:
@@ -62,7 +66,7 @@ services:
       - adhp
 
   db_adhp:
-    image: "postgres:latest"
+    image: "postgres:16"
     restart: unless-stopped
     ports:
       - 5439:5432

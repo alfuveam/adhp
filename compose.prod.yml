@@ -1,22 +1,26 @@
-version: '3.8'
-
 services:
   backend:
     image: ghcr.io/alfuveam/adhp/backend:latest
     container_name: backend-adhp
+    restart: unless-stopped
     environment:
       DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_USER: ${DATABASE_USER}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      DATABASE_PORT: ${DATABASE_PORT}
-      DATABASE_HOST: ${DATABASE_HOST}
+      # porta/host da rede interna do docker (5439 é só o mapeamento no host)
+      DATABASE_PORT: 5432
+      DATABASE_HOST: db_adhp
       CODE_HANDLER_API_URL: ${CODE_HANDLER_API_URL}
       CODE_HANDLER_KEY: ${CODE_HANDLER_KEY}
       SALTDB: ${SALTDB}
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
       MY_SIGNING_KEY: ${MY_SIGNING_KEY}
+    depends_on:
+      - db_adhp
     ports:
       - "8301:8301"
+    networks:
+      - adhp
 
   frontend-adhp:
     image: ghcr.io/alfuveam/adhp/frontend:latest
@@ -25,6 +29,12 @@ services:
       - "5190:5190"
     environment:
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      NUXT_PUBLIC_NUXT_API_URL: ${NUXT_PUBLIC_NUXT_API_URL}
+      NUXT_PUBLIC_DISCENTE: ${NUXT_PUBLIC_DISCENTE}
+      NUXT_PUBLIC_DOCENTE: ${NUXT_PUBLIC_DOCENTE}
+      NUXT_USE_MONACO_EDITOR: ${NUXT_USE_MONACO_EDITOR}
+    networks:
+      - adhp
 
   code_handler:
     image: ghcr.io/alfuveam/adhp/code_handler:latest
@@ -32,5 +42,34 @@ services:
     environment:
       CODE_HANDLER_KEY: ${CODE_HANDLER_KEY}
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
+    volumes:
+      - codes:/codes
     ports:
       - "8302:8302"
+    networks:
+      - adhp
+
+  db_adhp:
+    # fixado na major dos dados do volume: "latest" virou 18 e não abre dados de outra major
+    image: "postgres:16"
+    restart: unless-stopped
+    ports:
+      - 5439:5432
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    volumes:
+      - db_adhp:/var/lib/postgresql/data
+    networks:
+      - adhp
+
+volumes:
+  db_adhp:
+    driver: local
+  codes:
+    driver: local
+
+networks:
+  adhp:
+    external: true
