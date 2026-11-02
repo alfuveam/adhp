@@ -13,7 +13,7 @@
       </NuxtLink>
 
       <span class="study-badge study-badge-indigo text-[11px]">
-        {{ tipoDaLinguagem === 1 ? "Linguagem Golang" : "Linguagem Python" }}
+        {{ tipoDaLinguagem === 1 ? 'Linguagem Golang' : 'Linguagem Python' }}
       </span>
     </div>
 
@@ -32,11 +32,15 @@
       class="flex flex-col gap-6"
     >
       <div class="study-card p-6 border-[#dce1d9] bg-[#ffffff] shadow-none flex flex-col gap-2">
-        <label class="text-sm font-semibold text-slate-600 flex items-center gap-1.5">
+        <label
+          for="exercise-title"
+          class="text-sm font-semibold text-slate-600 flex items-center gap-1.5"
+        >
           <i class="pi pi-bookmark text-sky-800 text-sm"></i>
           <span>Título do Exercício</span>
         </label>
         <InputText
+          id="exercise-title"
           name="titulo_exercicio"
           v-model="valoresIniciais.titulo_exercicio"
           type="text"
@@ -66,7 +70,7 @@
           </div>
           <span class="text-sm font-mono font-semibold text-slate-600">Código Base do Aluno</span>
           <span class="text-[11px] text-slate-500 font-mono">{{
-            tipoDaLinguagem === 1 ? "Go" : "Python"
+            tipoDaLinguagem === 1 ? 'Go' : 'Python'
           }}</span>
         </div>
         <MonacoEditor
@@ -97,11 +101,12 @@
         <label class="text-sm font-semibold text-slate-600 mb-2 block">
           {{
             returnExec.out_put_from_user.success
-              ? "Saída da execução do código base:"
-              : "Erro da execução do código base:"
+              ? 'Saída da execução do código base:'
+              : 'Erro da execução do código base:'
           }}
         </label>
         <Textarea
+          aria-label="Resultado da execução"
           :model-value="
             returnExec.out_put_from_user.success
               ? returnExec.out_put_from_user.output
@@ -126,7 +131,7 @@
             >Código da Suíte de Testes</span
           >
           <span class="text-[11px] text-slate-500 font-mono">{{
-            tipoDaLinguagem === 1 ? "Go Test" : "PyTest"
+            tipoDaLinguagem === 1 ? 'Go Test' : 'PyTest'
           }}</span>
         </div>
         <MonacoEditor
@@ -157,11 +162,12 @@
         <label class="text-sm font-semibold text-slate-600 mb-2 block">
           {{
             returnExec.out_put_unit_teste.success
-              ? "Saída dos testes unitários:"
-              : "Erro dos testes unitários:"
+              ? 'Saída dos testes unitários:'
+              : 'Erro dos testes unitários:'
           }}
         </label>
         <Textarea
+          aria-label="Resultado da execução"
           :model-value="
             returnExec.out_put_unit_teste.success
               ? returnExec.out_put_unit_teste.output
@@ -197,7 +203,7 @@
                 v-if="!data.isEditing"
                 class="cursor-pointer text-sm text-slate-700 hover:text-indigo-300"
               >
-                {{ data.descricao || "(Clique para editar a dica)" }}
+                {{ data.descricao || '(Clique para editar a dica)' }}
               </div>
               <InputText
                 v-else
@@ -234,7 +240,6 @@
     </Form>
   </div>
 </template>
-
 
 <script setup lang="ts">
 definePageMeta({

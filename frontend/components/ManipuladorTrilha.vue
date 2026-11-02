@@ -18,11 +18,15 @@
       class="flex flex-col gap-5 pt-2"
     >
       <div class="flex flex-col gap-1.5">
-        <label class="text-sm font-semibold text-slate-600 flex items-center gap-1.5">
+        <label
+          for="trail-title"
+          class="text-sm font-semibold text-slate-600 flex items-center gap-1.5"
+        >
           <i class="pi pi-tag text-sky-800 text-sm"></i>
           <span>Título da Trilha</span>
         </label>
         <InputText
+          id="trail-title"
           name="titulo_trilha"
           v-model="valoresIniciais.titulo_trilha"
           type="text"
@@ -42,57 +46,61 @@
       </div>
 
       <div class="flex flex-col gap-2">
-        <label class="text-sm font-semibold text-slate-600 flex items-center gap-1.5">
+        <span
+          id="trail-language-label"
+          class="text-sm font-semibold text-slate-600 flex items-center gap-1.5"
+        >
           <i class="pi pi-code text-sky-800 text-sm"></i>
           <span>Linguagem de Programação</span>
-        </label>
+        </span>
 
         <RadioButtonGroup
+          aria-labelledby="trail-language-label"
           name="tipo_da_linguagem"
           v-model="valoresIniciais.tipo_da_linguagem"
           class="grid grid-cols-2 gap-3"
         >
-          <div
-            @click="valoresIniciais.tipo_da_linguagem = 1"
-            class="p-4 rounded-lg border cursor-pointer transition-all flex items-center gap-3.5"
+          <label
+            for="lang-go"
+            class="p-4 rounded-lg border cursor-pointer transition-all focus-within:ring-2 focus-within:ring-sky-800 focus-within:ring-offset-2 flex items-center gap-3.5"
             :class="
               valoresIniciais.tipo_da_linguagem === 1
                 ? 'bg-cyan-500/20 border-cyan-400 shadow-md shadow-cyan-500/10'
                 : 'bg-[#ffffff] border-[#dce1d9] hover:border-[#dce1d9]'
             "
           >
-            <RadioButton inputId="lang-go" :value="1" class="hidden" />
+            <RadioButton inputId="lang-go" :value="1" class="sr-only" />
             <span
               class="w-9 h-9 rounded-lg bg-cyan-500/20 text-sky-800 flex items-center justify-center font-semibold text-sm"
             >
               Go
             </span>
-            <div>
-              <div class="text-sm font-semibold text-slate-800">Golang</div>
-              <div class="text-[11px] text-slate-600">Compilada</div>
-            </div>
-          </div>
+            <span>
+              <span class="text-sm font-semibold text-slate-800">Golang</span>
+              <span class="text-[11px] text-slate-600">Compilada</span>
+            </span>
+          </label>
 
-          <div
-            @click="valoresIniciais.tipo_da_linguagem = 2"
-            class="p-4 rounded-lg border cursor-pointer transition-all flex items-center gap-3.5"
+          <label
+            for="lang-py"
+            class="p-4 rounded-lg border cursor-pointer transition-all focus-within:ring-2 focus-within:ring-sky-800 focus-within:ring-offset-2 flex items-center gap-3.5"
             :class="
               valoresIniciais.tipo_da_linguagem === 2
                 ? 'bg-amber-400/20 border-amber-400 shadow-md shadow-amber-500/10'
                 : 'bg-[#ffffff] border-[#dce1d9] hover:border-[#dce1d9]'
             "
           >
-            <RadioButton inputId="lang-py" :value="2" class="hidden" />
+            <RadioButton inputId="lang-py" :value="2" class="sr-only" />
             <span
               class="w-9 h-9 rounded-lg bg-amber-400/20 text-amber-800 flex items-center justify-center font-semibold text-sm"
             >
               Py
             </span>
-            <div>
-              <div class="text-sm font-semibold text-slate-800">Python</div>
-              <div class="text-[11px] text-slate-600">Interpretada</div>
-            </div>
-          </div>
+            <span>
+              <span class="text-sm font-semibold text-slate-800">Python</span>
+              <span class="text-[11px] text-slate-600">Interpretada</span>
+            </span>
+          </label>
         </RadioButtonGroup>
 
         <Message
@@ -111,13 +119,12 @@
           Cancelar
         </button>
         <button type="submit" class="study-btn-primary px-5 py-2 text-sm">
-          {{ isUpdate ? "Salvar Alterações" : "Criar Trilha" }}
+          {{ isUpdate ? 'Salvar Alterações' : 'Criar Trilha' }}
         </button>
       </div>
     </Form>
   </Dialog>
 </template>
-
 
 <script setup lang="ts">
 import Dialog from 'primevue/dialog';

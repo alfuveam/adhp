@@ -23,8 +23,12 @@
         class="flex flex-col gap-4"
       >
         <div class="flex flex-col gap-1.5">
-          <label class="text-sm font-semibold text-slate-600">Nome Completo</label>
+          <label for="createaccount-completename" class="text-sm font-semibold text-slate-600"
+            >Nome Completo</label
+          >
           <InputText
+            id="createaccount-completename"
+            autocomplete="name"
             v-model="initialValues.completename"
             name="completename"
             type="text"
@@ -44,9 +48,13 @@
         </div>
 
         <div class="flex flex-col gap-1.5">
-          <label class="text-sm font-semibold text-slate-600">Email Acadêmico ou Pessoal</label>
+          <label for="createaccount-email" class="text-sm font-semibold text-slate-600"
+            >E-mail</label
+          >
           <InputText
             v-model="initialValues.email"
+            id="createaccount-email"
+            autocomplete="email"
             name="email"
             type="email"
             placeholder="aluno@universidade.edu.br"
@@ -66,86 +74,87 @@
 
         <div class="flex flex-col gap-2">
           <div class="flex items-center justify-between">
-            <label class="text-sm font-semibold text-slate-600"
-              >Intervalo de Repetição Espaçada</label
+            <span id="review-interval-label" class="text-sm font-semibold text-slate-600"
+              >Intervalo de Repetição Espaçada</span
             >
             <span class="text-[11px] text-sky-800 font-semibold font-mono">Curva Ebbinghaus</span>
           </div>
 
           <RadioButtonGroup
+            aria-labelledby="review-interval-label"
             name="repeticao_espacada_minutos"
             v-model="initialValues.repeticao_espacada_minutos"
-            class="grid grid-cols-5 gap-2"
+            class="grid grid-cols-2 sm:grid-cols-5 gap-2"
           >
-            <div
-              @click="initialValues.repeticao_espacada_minutos = '1'"
-              class="flex flex-col items-center justify-center p-2.5 rounded-lg border cursor-pointer transition text-center"
+            <label
+              for="rep-1"
+              class="flex flex-col items-center justify-center p-2.5 rounded-lg border cursor-pointer transition text-center focus-within:ring-2 focus-within:ring-sky-800 focus-within:ring-offset-2"
               :class="
                 initialValues.repeticao_espacada_minutos === '1'
                   ? 'bg-[#285b75] border-[#285b75] text-white font-semibold border-b-2 border-b-[#204c63]'
                   : 'bg-[#ffffff] border-[#dce1d9] hover:border-[#dce1d9] text-slate-600'
               "
             >
-              <RadioButton inputId="rep-1" value="1" class="hidden" />
+              <RadioButton inputId="rep-1" value="1" class="sr-only" />
               <span class="text-sm font-semibold">1 Hora</span>
               <span class="text-[10px] opacity-75">Curto</span>
-            </div>
+            </label>
 
-            <div
-              @click="initialValues.repeticao_espacada_minutos = '2'"
-              class="flex flex-col items-center justify-center p-2.5 rounded-lg border cursor-pointer transition text-center"
+            <label
+              for="rep-2"
+              class="flex flex-col items-center justify-center p-2.5 rounded-lg border cursor-pointer transition text-center focus-within:ring-2 focus-within:ring-sky-800 focus-within:ring-offset-2"
               :class="
                 initialValues.repeticao_espacada_minutos === '2'
                   ? 'bg-[#285b75] border-[#285b75] text-white font-semibold border-b-2 border-b-[#204c63]'
                   : 'bg-[#ffffff] border-[#dce1d9] hover:border-[#dce1d9] text-slate-600'
               "
             >
-              <RadioButton inputId="rep-2" value="2" class="hidden" />
+              <RadioButton inputId="rep-2" value="2" class="sr-only" />
               <span class="text-sm font-semibold">9 Horas</span>
               <span class="text-[10px] opacity-75">Mesmo dia</span>
-            </div>
+            </label>
 
-            <div
-              @click="initialValues.repeticao_espacada_minutos = '3'"
-              class="flex flex-col items-center justify-center p-2.5 rounded-lg border cursor-pointer transition text-center"
+            <label
+              for="rep-3"
+              class="flex flex-col items-center justify-center p-2.5 rounded-lg border cursor-pointer transition text-center focus-within:ring-2 focus-within:ring-sky-800 focus-within:ring-offset-2"
               :class="
                 initialValues.repeticao_espacada_minutos === '3'
                   ? 'bg-[#285b75] border-[#285b75] text-white font-semibold border-b-2 border-b-[#204c63]'
                   : 'bg-[#ffffff] border-[#dce1d9] hover:border-[#dce1d9] text-slate-600'
               "
             >
-              <RadioButton inputId="rep-3" value="3" class="hidden" />
+              <RadioButton inputId="rep-3" value="3" class="sr-only" />
               <span class="text-sm font-semibold">1 Dia</span>
               <span class="text-[10px] opacity-75">Padrão</span>
-            </div>
+            </label>
 
-            <div
-              @click="initialValues.repeticao_espacada_minutos = '4'"
-              class="flex flex-col items-center justify-center p-2.5 rounded-lg border cursor-pointer transition text-center"
+            <label
+              for="rep-4"
+              class="flex flex-col items-center justify-center p-2.5 rounded-lg border cursor-pointer transition text-center focus-within:ring-2 focus-within:ring-sky-800 focus-within:ring-offset-2"
               :class="
                 initialValues.repeticao_espacada_minutos === '4'
                   ? 'bg-[#285b75] border-[#285b75] text-white font-semibold border-b-2 border-b-[#204c63]'
                   : 'bg-[#ffffff] border-[#dce1d9] hover:border-[#dce1d9] text-slate-600'
               "
             >
-              <RadioButton inputId="rep-4" value="4" class="hidden" />
+              <RadioButton inputId="rep-4" value="4" class="sr-only" />
               <span class="text-sm font-semibold">6 Dias</span>
               <span class="text-[10px] opacity-75">Semanal</span>
-            </div>
+            </label>
 
-            <div
-              @click="initialValues.repeticao_espacada_minutos = '5'"
-              class="flex flex-col items-center justify-center p-2.5 rounded-lg border cursor-pointer transition text-center"
+            <label
+              for="rep-5"
+              class="flex flex-col items-center justify-center p-2.5 rounded-lg border cursor-pointer transition text-center focus-within:ring-2 focus-within:ring-sky-800 focus-within:ring-offset-2"
               :class="
                 initialValues.repeticao_espacada_minutos === '5'
                   ? 'bg-[#285b75] border-[#285b75] text-white font-semibold border-b-2 border-b-[#204c63]'
                   : 'bg-[#ffffff] border-[#dce1d9] hover:border-[#dce1d9] text-slate-600'
               "
             >
-              <RadioButton inputId="rep-5" value="5" class="hidden" />
+              <RadioButton inputId="rep-5" value="5" class="sr-only" />
               <span class="text-sm font-semibold">31 Dias</span>
               <span class="text-[10px] opacity-75">Mensal</span>
-            </div>
+            </label>
           </RadioButtonGroup>
 
           <Message
@@ -160,8 +169,12 @@
         </div>
 
         <div class="flex flex-col gap-1.5">
-          <label class="text-sm font-semibold text-slate-600">Senha (mínimo 9 caracteres)</label>
+          <label for="createaccount-password" class="text-sm font-semibold text-slate-600"
+            >Senha (mínimo 9 caracteres)</label
+          >
           <Password
+            inputId="createaccount-password"
+            autocomplete="new-password"
             v-model="initialValues.password"
             name="password"
             placeholder="Digite uma senha forte"
@@ -188,9 +201,11 @@
 
         <button
           type="submit"
+          :disabled="submitting"
+          :aria-busy="submitting"
           class="study-btn-primary w-full mt-2 py-3 rounded-lg text-sm font-semibold"
         >
-          <span>Criar Minha Conta</span>
+          <span>{{ submitting ? 'Criando sua conta…' : 'Criar minha conta' }}</span>
           <i class="pi pi-arrow-right text-sm"></i>
         </button>
       </Form>
@@ -207,7 +222,6 @@
   </div>
 </template>
 
-
 <script setup lang="ts">
 import { ref } from 'vue';
 import { zodResolver } from '@primevue/forms/resolvers/zod';
@@ -216,6 +230,7 @@ import { useToast } from 'primevue/usetoast';
 
 const { $authService } = useNuxtApp();
 const toast = useToast();
+const submitting = ref(false);
 
 interface LoginToken {
   token: string;
@@ -235,20 +250,26 @@ const initialValues = ref({
 
 const resolver = zodResolver(
   z.object({
-    completename: z.string().min(5, { message: 'O nome completo deve ter entre 5 e 50 caracteres.' }).max(50, { message: 'Máximo de 50 caracteres.' }),
+    completename: z
+      .string()
+      .min(5, { message: 'O nome completo deve ter entre 5 e 50 caracteres.' })
+      .max(50, { message: 'Máximo de 50 caracteres.' }),
     email: z.string().email({ message: 'Insira um email válido.' }),
     repeticao_espacada_minutos: z.string().min(1, { message: 'Selecione o tempo da repetição.' }),
     password: z
       .string()
       .min(9, { message: 'A senha deve conter no mínimo 9 caracteres.' })
-      .max(100, { message: 'Máximo 100 caracteres.' })
+      .max(100, { message: 'Máximo 100 caracteres.' }),
   })
 );
 
 const onFormSubmit = async (e: any) => {
-  if (e.valid) {
-    toast.add({ severity: 'info', summary: 'Cadastrando conta...', life: 2000 });
+  if (!e.valid || submitting.value) return;
+  submitting.value = true;
+  try {
     await createAccount();
+  } finally {
+    submitting.value = false;
   }
 };
 
@@ -256,21 +277,21 @@ async function createAccount() {
   try {
     const config = useRuntimeConfig();
     const response = await fetch(config.public.BACKEND_API_URL + '/v1/registeraccount', {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         completename: initialValues.value.completename,
         cpf: initialValues.value.cpf || '000.000.000-00',
         idade: Number(initialValues.value.idade) || 20,
         sexo: Number(initialValues.value.sexo) || 1,
-        experiencia_programacao: initialValues.value.experiencia_programacao === "true",
+        experiencia_programacao: initialValues.value.experiencia_programacao === 'true',
         phone: initialValues.value.phone || '000000000',
         email: initialValues.value.email,
         repeticao_espacada_minutos: Number(initialValues.value.repeticao_espacada_minutos),
-        password: initialValues.value.password
-      })
+        password: initialValues.value.password,
+      }),
     });
 
     if (response.ok) {
@@ -291,18 +312,29 @@ async function createAccount() {
       }
     } else {
       const errorData = await response.json().catch(() => ({}));
-      let textError = errorData.error_completename ||
+      let textError =
+        errorData.error_completename ||
         errorData.error_email ||
         errorData.error_password ||
         errorData.error_repeticao_espacada_minutos ||
         errorData.error ||
         'Verifique os dados informados.';
 
-      toast.add({ severity: 'error', summary: 'Erro ao criar conta', detail: textError, life: 4000 });
+      toast.add({
+        severity: 'error',
+        summary: 'Erro ao criar conta',
+        detail: textError,
+        life: 4000,
+      });
     }
   } catch (error) {
     console.error(error);
-    toast.add({ severity: 'error', summary: 'Erro de conexão', detail: 'Não foi possível conectar ao servidor.', life: 3000 });
+    toast.add({
+      severity: 'error',
+      summary: 'Erro de conexão',
+      detail: 'Não foi possível conectar ao servidor.',
+      life: 3000,
+    });
   }
 }
 </script>

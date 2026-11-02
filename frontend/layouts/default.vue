@@ -4,7 +4,7 @@
     <header class="site-header">
       <div class="site-nav">
         <NuxtLink to="/" class="site-brand" aria-label="ADHP — início">
-          <img src="~/assets/images/logo_adhp.webp" alt="" width="38" height="38" />
+          <img src="/icon.svg" alt="" width="38" height="38" />
           <span
             >ADHP<span class="brand-dot">.</span
             ><small>Um espaço para aprender programação</small></span
@@ -27,8 +27,7 @@
     <main id="conteudo" class="site-main"><slot /></main>
     <footer class="site-footer">
       <div>
-        <span>ADHP · Ambiente para o Desenvolvimento de Habilidades em Programação</span
-        ><span>Projeto acadêmico · Ciência da Computação · UNESC</span>
+        <span>ADHP · Ambiente para o Desenvolvimento de Habilidades em Programação</span>
       </div>
       <NuxtLink to="/sitemap">Mapa do site</NuxtLink>
     </footer>

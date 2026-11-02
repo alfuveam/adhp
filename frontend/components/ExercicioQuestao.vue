@@ -1,275 +1,216 @@
 <template>
-  <div class="w-full max-w-full">
-    <ConfirmDialog />
-
-    <Form
-      v-slot="$form"
-      :initialValues="initialValues"
-      :resolver="resolver"
-      @submit="onFormSubmit"
-      class="w-full flex flex-col gap-6"
-    >
-      <div
-        class="study-card p-6 border-[#dce1d9] bg-[#ffffff] shadow-none flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+  <form class="w-full min-w-0 space-y-5" @submit.prevent="submitSolution" :aria-busy="submitting">
+    <div class="study-card p-5 sm:p-6 flex flex-wrap items-start justify-between gap-4">
+      <div class="min-w-0 space-y-2">
+        <span class="study-badge study-badge-blue">{{ language === 1 ? 'Go' : 'Python' }}</span>
+        <h2 class="text-xl font-semibold text-slate-800 break-words">
+          {{ exercicio.name || 'Exercício' }}
+        </h2>
+      </div>
+      <button
+        type="button"
+        class="study-btn-secondary px-4 py-2 text-sm"
+        :disabled="submitting || !exercicio.id"
+        @click="$emit('show-toast', exercicio)"
       >
-        <div class="space-y-1.5">
-          <div class="flex items-center gap-2.5">
-            <span
-              class="px-2.5 py-0.5 rounded-full text-sm font-semibold"
-              :class="tipoDaLinguagem === 1 ? 'study-badge-blue' : 'study-badge-amber'"
-            >
-              {{ tipoDaLinguagem === 1 ? "Golang" : "Python" }}
-            </span>
-            <span class="text-sm text-slate-600 font-medium">• Desafio Prático</span>
-          </div>
-          <h2 class="text-xl sm:text-2xl font-semibold text-slate-800 tracking-tight">
-            {{ exercicio.name || "Exercício" }}
-          </h2>
-        </div>
+        <i class="pi pi-info-circle" aria-hidden="true"></i> Preciso de uma dica
+      </button>
+    </div>
 
-        <button
-          type="button"
-          @click="showFeedback(exercicio)"
-          class="study-btn-secondary px-4 py-2 text-sm flex items-center gap-2"
-        >
-          <i class="pi pi-info-circle text-sm text-sky-800"></i>
-          <span>Preciso de uma dica</span>
-        </button>
+    <div class="editor-panel">
+      <div class="editor-toolbar">
+        <span>{{ language === 1 ? 'main.go' : 'main.py' }}</span
+        ><span>Escreva sua solução</span>
       </div>
+      <MonacoEditor
+        v-model="code"
+        :options="editorOptions"
+        :lang="language === 1 ? 'go' : 'python'"
+        class="h-[400px] sm:h-[480px] w-full"
+      />
+    </div>
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <p class="text-sm text-slate-600">
+        Você pode testar e ajustar sua solução quantas vezes precisar.
+      </p>
+      <button
+        type="submit"
+        class="study-btn-primary px-5 py-3 text-sm"
+        :disabled="submitting || !exercicio.id"
+      >
+        <i :class="submitting ? 'pi pi-spin pi-spinner' : 'pi pi-play'" aria-hidden="true"></i>
+        {{ submitting ? 'Verificando sua solução…' : callBackSubmitText || 'Testar minha solução' }}
+      </button>
+    </div>
 
-      <div class="editor-panel">
-        <div class="editor-toolbar">
-          <span>{{ tipoDaLinguagem === 1 ? "main.go" : "main.py" }}</span
-          ><span>Escreva sua solução</span>
-        </div>
-        <div class="relative w-full">
-          <MonacoEditor
-            name="codigo_base"
-            v-model="exercicio.codigo_base"
-            :options="optionsEditor"
-            :lang="tipoDaLinguagem === 1 ? 'go' : 'python'"
-            class="h-[460px] sm:h-[520px] w-full z-10"
-          />
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div
-          class="rounded-lg border border-[#dce1d9] overflow-hidden bg-[#ffffff] shadow-none flex flex-col"
+    <section
+      v-if="message"
+      role="status"
+      aria-live="polite"
+      class="study-card p-5 border-l-4"
+      :class="message.kind === 'success' ? 'border-l-emerald-700' : 'border-l-amber-700'"
+    >
+      <h3 class="font-semibold text-slate-800">{{ message.title }}</h3>
+      <p class="mt-2 text-sm text-slate-600">{{ message.detail }}</p>
+    </section>
+    <section v-if="result" class="study-card p-5 space-y-4" aria-label="Resultado da tentativa">
+      <div>
+        <h3 class="font-semibold text-slate-800">Saída do programa</h3>
+        <pre
+          v-if="result.out_put_from_user.output"
+          class="study-output mt-3"
+          tabindex="0"
+          aria-label="Saída do programa"
+          >{{ result.out_put_from_user.output }}</pre
         >
-          <div
-            class="flex items-center justify-between px-4 py-2.5 bg-[#ffffff] border-b border-[#dce1d9]"
-          >
-            <div class="flex items-center gap-2">
-              <i class="pi pi-terminal text-slate-600 text-sm"></i>
-              <span class="text-sm font-semibold text-slate-700">Saída do programa</span>
-            </div>
+        <p v-else class="mt-2 text-sm text-slate-600">
+          {{
+            result.out_put_from_user.success
+              ? 'Seu programa não exibiu uma mensagem nesta execução.'
+              : 'O programa não produziu uma saída antes do erro.'
+          }}
+        </p>
+      </div>
+      <details
+        v-if="
+          result.out_put_from_user.error ||
+          result.out_put_unit_teste.error ||
+          result.out_put_unit_teste.output
+        "
+        class="border-t border-slate-200 pt-4"
+      >
+        <summary class="cursor-pointer text-sm font-semibold text-sky-800">
+          Ver mensagens técnicas e verificações
+        </summary>
+        <div class="space-y-3 mt-3">
+          <div v-if="result.out_put_from_user.error">
+            <h4 class="text-sm font-semibold">Mensagem da execução</h4>
+            <pre class="study-output mt-2" tabindex="0">{{ result.out_put_from_user.error }}</pre>
           </div>
-          <div class="p-3.5 flex-1 bg-[#ffffff]">
-            <textarea
-              v-model="retorno_codigo"
-              readonly
-              placeholder="A saída padrão do seu código aparecerá aqui..."
-              class="w-full h-32 bg-transparent text-slate-600 font-mono text-sm resize-none focus-visible:outline-sky-800 placeholder-slate-600 leading-relaxed"
-            ></textarea>
+          <div v-if="result.out_put_unit_teste.error || result.out_put_unit_teste.output">
+            <h4 class="text-sm font-semibold">Verificações do exercício</h4>
+            <pre class="study-output mt-2" tabindex="0">{{
+              result.out_put_unit_teste.error || result.out_put_unit_teste.output
+            }}</pre>
           </div>
         </div>
-
-        <div
-          class="rounded-lg border border-[#dce1d9] overflow-hidden bg-[#ffffff] shadow-none flex flex-col"
-        >
-          <div
-            class="flex items-center justify-between px-4 py-2.5 bg-[#ffffff] border-b border-[#dce1d9]"
-          >
-            <div class="flex items-center gap-2">
-              <i class="pi pi-verified text-emerald-700 text-sm"></i>
-              <span class="text-sm font-semibold text-slate-700">Resultado da verificação</span>
-            </div>
-          </div>
-          <div class="p-3.5 flex-1 bg-[#ffffff]">
-            <textarea
-              v-model="retorno_teste"
-              readonly
-              placeholder="O relatório da bateria de testes aparecerá aqui..."
-              class="w-full h-32 bg-transparent text-emerald-700 font-mono text-sm resize-none focus-visible:outline-sky-800 placeholder-slate-600 leading-relaxed"
-            ></textarea>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex justify-end pt-2">
-        <button
-          type="submit"
-          class="study-btn-primary px-8 py-3 text-sm font-semibold flex items-center justify-center gap-2"
-        >
-          <i class="pi pi-send text-sm"></i>
-          <span>{{ callBackSubmitText || "Testar minha solução" }}</span>
-        </button>
-      </div>
-    </Form>
-  </div>
+      </details>
+    </section>
+  </form>
 </template>
 
-
 <script setup lang="ts">
-import * as Monaco from 'monaco-editor';
-import { ref, reactive, watch, onMounted } from 'vue';
-import { zodResolver } from '@primevue/forms/resolvers/zod';
-import { z } from 'zod';
+import type { editor } from 'monaco-editor';
 import type { PrimeVueDataExercicio, RetornoExecucao } from '~/types';
-import { useToast } from 'primevue/usetoast';
+import { executionGuidance, isExecutionResult } from '~/utils/learning';
 
-const optionsEditor = ref<Monaco.editor.IStandaloneEditorConstructionOptions>({
+const props = defineProps<{
+  exercicio: PrimeVueDataExercicio;
+  callBackSubmitText?: string;
+  tipoLinguagem?: number;
+  repeticaoId?: string;
+}>();
+const emit = defineEmits(['show-toast', 'call-back-atualizar-lista', 'busy']);
+const route = useRoute();
+const { $authService } = useNuxtApp();
+const language = computed(
+  () => props.tipoLinguagem ?? Number(Array.isArray(route.params.id) ? route.params.id[2] : 0)
+);
+const code = ref('');
+const submitting = ref(false);
+const result = ref<RetornoExecucao | null>(null);
+const message = ref<ReturnType<typeof executionGuidance> | null>(null);
+const editorOptions = computed<editor.IStandaloneEditorConstructionOptions>(() => ({
   theme: 'vs-dark',
-  fontSize: 14,
-  lineHeight: 22,
-  fontFamily: '"JetBrains Mono", Menlo, Monaco, "Courier New", monospace',
+  fontSize: 15,
+  lineHeight: 24,
+  fontFamily: '"JetBrains Mono", monospace',
   minimap: { enabled: false },
   scrollBeyondLastLine: false,
   automaticLayout: true,
-  padding: { top: 12, bottom: 12 }
-});
+  padding: { top: 16, bottom: 16 },
+  readOnly: submitting.value,
+  ariaLabel: 'Código da sua solução',
+  tabFocusMode: true,
+}));
 
-const route = useRoute();
-const toast = useToast();
-const { $authService } = useNuxtApp();
-let refQuillCodigoBase = ref(null);
-const exercicioID = ref('');
-
-const tipoDaLinguagem = ref(0);
-const initialValues = reactive({
-    codigo_base: ''
-});
-
-const props = defineProps({
-  exercicio: {
-    type: Object as () => PrimeVueDataExercicio,
-    required: true
+watch(
+  () => [props.exercicio.id, props.exercicio.codigo_base],
+  ([id, source], previous) => {
+    if (previous?.[0] === id && (submitting.value || result.value)) return;
+    try {
+      code.value = decodeURIComponent(atob(source || ''));
+    } catch {
+      code.value = source || '';
+    }
+    result.value = null;
+    message.value = null;
   },
-  callBackSubmitText: {
-    type: String,
-    required: true
-  }
-});
-
-const emit = defineEmits(['show-toast', 'call-back-atualizar-lista']);
-
-const retorno_codigo = ref('');
-const retorno_teste = ref('');
-const codigoBaseToSend = ref('');
-
-const showFeedback = (e: PrimeVueDataExercicio) => {
-  emit('show-toast', e);
-};
-
-const resolver = zodResolver(
-  z.object({
-    codigo_base: z.string().min(1, { message: 'Código base exercício é necessário.' })
-  })
+  { immediate: true }
 );
 
-const onFormSubmit = async ({ valid }: { valid: boolean }) => {
-  if (valid) {
-    toast.add({
-      severity: 'info',
-      summary: 'Executando código...',
-      life: 2000
-    });
+watch(code, () => {
+  if (!submitting.value && result.value) {
+    result.value = null;
+    message.value = null;
   }
+});
 
-  if (useRuntimeConfig().public.USE_MONACO_EDITOR == "true") {
-    codigoBaseToSend.value = props.exercicio.codigo_base;
-  } else {
-    // @ts-ignore
-    codigoBaseToSend.value = refQuillCodigoBase.value?.quill?.getText();
+async function submitSolution() {
+  if (submitting.value || !props.exercicio.id) return;
+  if (!code.value.trim()) {
+    message.value = {
+      kind: 'warning',
+      title: 'Escreva sua solução primeiro',
+      detail: 'Use o editor acima para escrever seu código antes de testar.',
+    };
+    return;
   }
-
+  submitting.value = true;
+  emit('busy', true);
+  message.value = null;
+  result.value = null;
+  const exerciseId = props.exercicio.id;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 60000);
   try {
     const config = useRuntimeConfig();
-    const response = await fetch(config.public.BACKEND_API_URL + '/v1/discente_submit_exercicio', {
-      method: "POST",
+    const endpoint = props.repeticaoId
+      ? '/v1/discente_submit_exerc_rep_espacada'
+      : '/v1/discente_submit_exercicio';
+    const response = await fetch(config.public.BACKEND_API_URL + endpoint, {
+      method: 'POST',
+      signal: controller.signal,
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + $authService.getToken()
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + $authService.getToken(),
       },
       body: JSON.stringify({
-        exercicio_id: props.exercicio.id,
-        codigo_base: btoa(encodeURIComponent(codigoBaseToSend.value))
-      })
+        exercicio_id: exerciseId,
+        codigo_base: btoa(encodeURIComponent(code.value)),
+        ...(props.repeticaoId ? { repeticao_espacada_id: props.repeticaoId } : {}),
+      }),
     });
-
-    const exercicioResponse: RetornoExecucao = await response.json();
-    if (response.ok) {
-      retorno_codigo.value = exercicioResponse.out_put_from_user.output;
-      retorno_teste.value = exercicioResponse.out_put_unit_teste.output;
-
-      if (exercicioResponse.out_put_from_user.success && exercicioResponse.out_put_unit_teste.success) {
-        toast.add({ severity: 'success', summary: 'Parabéns!', detail: 'Exercício resolvido com sucesso!', life: 3500 });
-        emit('call-back-atualizar-lista');
-      } else {
-        retorno_codigo.value = exercicioResponse.out_put_from_user.error || exercicioResponse.out_put_from_user.output;
-        retorno_teste.value = exercicioResponse.out_put_unit_teste.error || exercicioResponse.out_put_unit_teste.output;
-        toast.add({ severity: 'error', summary: 'Atenção aos testes', detail: 'Um ou mais testes não passaram.', life: 3500 });
-      }
-    } else {
-      toast.add({ severity: 'error', summary: 'Erro ao submeter', detail: 'Falha ao processar o código no servidor.', life: 3000 });
-    }
-  } catch(error) {
-    console.log(error);
+    if (!response.ok) throw new Error('request');
+    const data: unknown = await response.json();
+    if (!isExecutionResult(data)) throw new Error('response');
+    if (props.exercicio.id !== exerciseId) return;
+    result.value = data;
+    message.value = executionGuidance(data);
+    if (data.out_put_from_user.success && data.out_put_unit_teste.success)
+      emit('call-back-atualizar-lista');
+  } catch {
+    if (props.exercicio.id === exerciseId)
+      message.value = {
+        kind: 'warning',
+        title: 'Não foi possível verificar sua solução',
+        detail:
+          'A execução não terminou ou houve uma falha de conexão. Seu código continua no editor. Tente novamente em instantes.',
+      };
+  } finally {
+    clearTimeout(timeout);
+    submitting.value = false;
+    emit('busy', false);
   }
-};
-
-watch(async () => props.exercicio, async (newExercicio) => {
-  try {
-    const exercicioProps = await newExercicio;
-    if (useRuntimeConfig().public.USE_MONACO_EDITOR == "true") {
-      props.exercicio.codigo_base = decodeURIComponent(atob(props.exercicio.codigo_base));
-    } else {
-      const v = decodeURIComponent(atob(exercicioProps.codigo_base));
-      // @ts-ignore
-      refQuillCodigoBase.value?.quill?.setText(v);
-    }
-    if (exercicioID.value != '' && exercicioID.value != exercicioProps.id) {
-      retorno_codigo.value = "";
-      retorno_teste.value = "";
-    }
-
-    exercicioID.value = exercicioProps.id;
-  } catch (error) {
-    console.log(error);
-  }
-});
-
-onMounted(() => {
-  if (route.params.id && Array.isArray(route.params.id) && route.params.id.length > 2) {
-    tipoDaLinguagem.value = Number(route.params.id[2]);
-  }
-  const intervalId = setInterval(checkIfQuillIsLoad, 100);
-
-  function checkIfQuillIsLoad() {
-    if (useRuntimeConfig().public.USE_MONACO_EDITOR == "true") {
-      clearInterval(intervalId);
-      if (props.exercicio?.codigo_base) {
-        try {
-          const v = decodeURIComponent(atob(props.exercicio.codigo_base));
-          props.exercicio.codigo_base = v;
-        } catch {
-          // already decoded
-        }
-      }
-    } else {
-      // @ts-ignore
-      if (refQuillCodigoBase && refQuillCodigoBase.value?.quill?.root) {
-        clearInterval(intervalId);
-        try {
-          const v = decodeURIComponent(atob(props.exercicio.codigo_base));
-          // @ts-ignore
-          refQuillCodigoBase.value?.quill?.setText(v);
-        } catch {
-          // already decoded
-        }
-      }
-    }
-  }
-});
+}
 </script>

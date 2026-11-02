@@ -1,9 +1,9 @@
-@import "primeicons/primeicons.css";
+@import 'primeicons/primeicons.css';
 @layer tailwind-base, primevue, tailwind-utilities;
 @layer tailwind-base {
   @tailwind base;
   html {
-    font-family: "Segoe UI", system-ui, sans-serif;
+    font-family: 'Segoe UI', system-ui, sans-serif;
     color-scheme: light;
     scroll-behavior: smooth;
     scroll-padding-top: 24px;
@@ -323,4 +323,97 @@ details[open] > summary {
 }
 .skip-link:focus {
   top: 12px;
+}
+
+/* Shared notifications, including toasts rendered outside the page container. */
+.p-toast.p-component {
+  width: min(24rem, calc(100vw - 2.5rem));
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+.p-toast .p-toast-message {
+  --study-notice-accent: #285b75;
+  background: #fff;
+  color: #263332;
+  border: 1px solid #dce1d9;
+  border-inline-start: 3px solid var(--study-notice-accent);
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgb(38 51 50 / 10%);
+  backdrop-filter: none;
+  margin-block-end: 12px;
+}
+.p-toast .p-toast-message-success {
+  --study-notice-accent: #326449;
+}
+.p-toast .p-toast-message-warn {
+  --study-notice-accent: #87601d;
+}
+.p-toast .p-toast-message-error {
+  --study-notice-accent: #a43c3c;
+}
+.p-toast .p-toast-message-secondary,
+.p-toast .p-toast-message-contrast {
+  --study-notice-accent: #65706b;
+}
+.p-toast .p-toast-message-content {
+  padding: 16px;
+  gap: 12px;
+  align-items: flex-start;
+}
+.p-toast .p-toast-message-icon {
+  color: var(--study-notice-accent);
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-block-start: 1px;
+}
+.p-toast .p-toast-message-text {
+  min-width: 0;
+  gap: 4px;
+  overflow-wrap: anywhere;
+}
+.p-toast .p-toast-summary {
+  color: #263332;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.p-toast .p-toast-detail {
+  color: #65706b;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.65;
+  margin: 0;
+  white-space: pre-wrap;
+}
+.p-toast .p-toast-detail:empty {
+  display: none;
+}
+.p-toast .p-toast-close-button {
+  color: #65706b;
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+.p-toast .p-toast-close-button:hover {
+  background: #eef3f4;
+  color: #285b75;
+}
+.p-toast .p-toast-close-button:focus-visible {
+  outline: 2px solid #285b75;
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+.study-output {
+  max-height: 20rem;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: #f4f6f2;
+  border: 1px solid #dce1d9;
+  border-radius: 6px;
+  padding: 14px;
+  color: #263332;
+  font: 13px/1.7 ui-monospace, monospace;
 }

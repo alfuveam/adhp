@@ -1,197 +1,187 @@
 <template>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
     <Toast />
-
-    <div class="flex items-center justify-between pb-2 border-b border-slate-200">
-      <NuxtLink
-        to="/dashboard_discente"
-        class="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-800 transition"
-      >
-        <i class="pi pi-arrow-left text-sm"></i>
-        <span>Voltar ao Painel de Trilhas</span>
-      </NuxtLink>
-
-      <div class="flex items-center gap-2">
-        <span class="study-badge study-badge-indigo text-[11px]">
-          Lista: {{ lista?.name || "Carregando..." }}
-        </span>
-      </div>
+    <NuxtLink to="/dashboard_discente" class="inline-flex items-center gap-2 text-sm text-sky-800"
+      ><i class="pi pi-arrow-left" aria-hidden="true"></i> Voltar aos meus estudos</NuxtLink
+    >
+    <p v-if="loading" role="status" class="study-card p-6">Carregando os exercícios da lista…</p>
+    <div v-else-if="loadError" role="alert" class="study-card p-6 space-y-3">
+      <p>{{ loadError }}</p>
+      <button type="button" class="study-btn-secondary px-4 py-2" @click="loadList">
+        Tentar novamente
+      </button>
     </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-      <div class="lg:col-span-4 study-card p-5 border-[#dce1d9] bg-[#ffffff] shadow-none space-y-4">
-        <div class="flex items-center justify-between pb-3 border-b border-[#dce1d9]">
-          <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
-            <i class="pi pi-list text-sky-800 text-sm"></i>
-            <span>Desafios da Lista</span>
-          </h3>
-          <span class="text-sm text-sky-800 font-mono font-semibold">
-            {{ currentStep + 1 }}/{{ lista?.exercicios?.length || 0 }}
-          </span>
+    <p v-else-if="!lista.exercicios.length" class="study-card p-6">
+      Esta lista ainda não tem exercícios. Volte ao painel para escolher outra lista.
+    </p>
+    <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <nav aria-label="Exercícios da lista" class="lg:col-span-4 study-card p-5 space-y-4 min-w-0">
+        <div>
+          <h1 class="font-semibold text-lg">
+            {{ lista.name === '-' ? 'Exercícios da lista' : lista.name }}
+          </h1>
+          <p class="text-sm text-slate-600">
+            {{ completedCount }} de {{ lista.exercicios.length }} concluídos
+          </p>
         </div>
-
-        <div class="space-y-2 max-h-[580px] overflow-y-auto pr-1">
-          <div
-            v-for="(exercicio, index) in lista?.exercicios"
-            :key="index"
-            @click="
-              exercicio.data.habilitado &&
-                ((currentStep = index), exercicioSelecionado(exercicio.data))
-            "
-            class="p-3.5 rounded-lg border transition-all duration-200 flex items-center justify-between gap-3"
-            :class="[
-              currentStep === index
-                ? 'bg-[#285b75]/20 border-[#285b75] text-slate-800 font-semibold shadow-md shadow-purple-500/10'
-                : exercicio.data.habilitado
-                ? 'bg-[#ffffff] border-[#dce1d9] hover:border-[#dce1d9] text-slate-700 cursor-pointer'
-                : 'bg-[#ffffff] border-[#dce1d9] text-slate-500 cursor-not-allowed opacity-60',
-            ]"
-          >
-            <div class="flex items-center gap-3 truncate">
-              <span
-                class="w-6 h-6 rounded-lg flex items-center justify-center text-sm font-mono font-semibold shrink-0"
-                :class="
-                  currentStep === index ? 'bg-[#285b75] text-white' : 'bg-[#ffffff] text-slate-600'
-                "
+        <ol class="space-y-2 max-h-[580px] overflow-y-auto p-1">
+          <li v-for="(item, index) in lista.exercicios" :key="item.data.id">
+            <button
+              type="button"
+              class="w-full p-3 rounded-lg border flex items-start gap-3 text-left"
+              :class="currentStep === index ? 'bg-sky-900/5 border-sky-800' : 'border-slate-200'"
+              :disabled="busy || !item.data.habilitado"
+              :aria-current="currentStep === index ? 'step' : undefined"
+              @click="selectExercise(index)"
+            >
+              <span class="text-sm text-slate-500">{{ index + 1 }}.</span>
+              <span class="min-w-0 flex-1"
+                ><span class="block text-sm break-words">{{ item.data.name }}</span
+                ><span class="block text-xs mt-1" :class="exerciseStatus(item.data).color"
+                  ><i :class="exerciseStatus(item.data).icon" aria-hidden="true"></i>
+                  {{ exerciseStatus(item.data).label }}</span
+                ></span
               >
-                {{ index + 1 }}
-              </span>
-              <span class="text-sm truncate">
-                {{ exercicio.data.name }}
-              </span>
-            </div>
-
-            <span class="shrink-0 text-sm">
-              <i v-if="!exercicio.data.habilitado" class="pi pi-lock text-slate-500"></i>
-              <i v-else-if="currentStep === index" class="pi pi-play text-sky-800"></i>
-              <i v-else class="pi pi-check-circle text-emerald-700"></i>
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div class="lg:col-span-8">
+            </button>
+          </li>
+        </ol>
+      </nav>
+      <div class="lg:col-span-8 min-w-0">
         <ExercicioQuestao
-          :exercicio="exercicioSelecionada"
-          @call-back-atualizar-lista="atualizarLista"
+          v-if="selected?.habilitado"
+          :exercicio="selected"
           callBackSubmitText="Testar minha solução"
-          @show-toast="showToastFeedBack"
+          @busy="busy = $event"
+          @show-toast="showHint"
+          @call-back-atualizar-lista="refreshList"
         />
+        <p v-else class="study-card p-6" role="status">
+          Este exercício ainda está bloqueado. Escolha um exercício disponível na lista para
+          continuar.
+        </p>
       </div>
     </div>
   </div>
 </template>
-
-
 <script setup lang="ts">
 import type { Listas, PrimeVueDataExercicio } from '~/types';
+import { exerciseStatus } from '~/utils/learning';
 import { useToast } from 'primevue/usetoast';
-
-const toast = useToast();
+definePageMeta({ middleware: 'auth-discente' });
 const route = useRoute();
 const { $authService } = useNuxtApp();
-
+const toast = useToast();
+const loading = ref(true);
+const loadError = ref('');
+const busy = ref(false);
 const currentStep = ref(0);
-const idLista = ref('');
-
-const showToastFeedBack = async (e: PrimeVueDataExercicio) => {
+const lista = ref<Listas>({ id: '', name: '', isEditing: false, exercicios: [] });
+const selected = computed(() => lista.value.exercicios[currentStep.value]?.data);
+const completedCount = computed(
+  () => lista.value.exercicios.filter((item) => item.data.codigo_rodou).length
+);
+const listId = computed(() => (Array.isArray(route.params.id) ? route.params.id[0] : ''));
+async function loadList() {
+  if (import.meta.server) return;
+  loading.value = true;
+  loadError.value = '';
+  try {
+    await fetchList();
+  } catch {
+    loadError.value =
+      'Não foi possível carregar esta lista. Seu progresso continua salvo. Tente novamente.';
+  } finally {
+    loading.value = false;
+  }
+}
+async function fetchList() {
+  const response = await fetch(
+    useRuntimeConfig().public.BACKEND_API_URL +
+      '/v1/exercicios_habilitados_by_lista/' +
+      listId.value,
+    {
+      signal: AbortSignal.timeout(20000),
+      headers: { Authorization: 'Bearer ' + $authService.getToken() },
+    }
+  );
+  if (!response.ok) throw new Error('request');
+  const data = await response.json();
+  if (!Array.isArray(data)) throw new Error('response');
+  lista.value = data[0] || { id: listId.value, name: '', isEditing: false, exercicios: [] };
+  lista.value.exercicios ||= [];
+  if (currentStep.value >= lista.value.exercicios.length || currentStep.value < 0)
+    currentStep.value = 0;
+}
+async function refreshList() {
+  try {
+    await fetchList();
+  } catch {
+    toast.add({
+      severity: 'warn',
+      summary: 'Sua solução foi aprovada',
+      detail:
+        'Não foi possível atualizar a lista agora. Recarregue a lista para ver o próximo exercício.',
+      life: 6000,
+    });
+  }
+}
+function selectExercise(index: number) {
+  if (busy.value || !lista.value.exercicios[index]?.data.habilitado) return;
+  currentStep.value = index;
+  const exercise = selected.value;
+  if (!exercise) return;
+  fetch(useRuntimeConfig().public.BACKEND_API_URL + '/v1/metricas_exercicio', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + $authService.getToken(),
+    },
+    body: JSON.stringify({
+      exercicio_id: exercise.id,
+      tipo_metrica: useRuntimeConfig().public.METRICAS.INICIO,
+    }),
+  }).catch(() => {});
+}
+async function showHint(exercise: PrimeVueDataExercicio) {
   try {
     const config = useRuntimeConfig();
-    const response = await fetch(config.public.BACKEND_API_URL + '/v1/feedback_by_exercicio_id/' + e.id + '/' + config.public.METRICAS_FEEDBACK.EXERCICIO, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + $authService.getToken()
+    const response = await fetch(
+      config.public.BACKEND_API_URL +
+        '/v1/feedback_by_exercicio_id/' +
+        exercise.id +
+        '/' +
+        config.public.METRICAS_FEEDBACK.EXERCICIO,
+      {
+        signal: AbortSignal.timeout(20000),
+        headers: { Authorization: 'Bearer ' + $authService.getToken() },
       }
+    );
+    if (!response.ok) throw new Error('request');
+    const data = await response.json();
+    toast.add({
+      severity: 'info',
+      summary: 'Uma dica para continuar',
+      detail: data.feedback || 'Este exercício ainda não tem uma dica disponível.',
+      life: 8000,
     });
-
-    if (response.ok) {
-      const data = await response.json();
-      toast.add({ severity: 'info', summary: 'Dica do Assistente', detail: data.feedback, life: 5000 });
-    } else {
-      toast.add({ severity: 'error', summary: 'Erro', detail: "Não foi possível obter o feedback no momento.", life: 3000 });
-    }
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const lista = ref<Listas>({
-  id: '',
-  name: '',
-  exercicios: [],
-  isEditing: false
-});
-
-const exercicioSelecionada = ref<PrimeVueDataExercicio>({
-  name: '',
-  id: '',
-  inputValue: '',
-  type: 0,
-  codigo_rodou: false,
-  codigo_base: '',
-  habilitado: false,
-  order_index: 0,
-});
-
-const exercicioSelecionado = (exercicio: PrimeVueDataExercicio) => {
-  exercicioSelecionada.value = exercicio;
-  onSubmitMetricaExercicioInicio(exercicio);
-};
-
-const atualizarLista = async () => {
-  await getExerciciosHabilitadosByLista();
-};
-
-const getExerciciosHabilitadosByLista = async () => {
-  try {
-    const response = await fetch(useRuntimeConfig().public.BACKEND_API_URL + '/v1/exercicios_habilitados_by_lista/' + idLista.value, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + $authService.getToken()
-      }
+  } catch {
+    toast.add({
+      severity: 'error',
+      summary: 'Não foi possível carregar a dica',
+      detail: 'Tente novamente em instantes.',
+      life: 4000,
     });
-
-    if (response.ok) {
-      const resData = await response.json();
-      if (resData && resData.length > 0) {
-        lista.value = resData[0];
-        if (lista.value.exercicios && lista.value.exercicios[currentStep.value]) {
-          exercicioSelecionada.value = lista.value.exercicios[currentStep.value].data;
-        }
-      }
-    } else {
-      toast.add({ severity: 'error', summary: 'Erro', detail: 'Falha ao carregar a lista de exercícios.', life: 3000 });
-    }
-  } catch (error) {
-    console.log(error);
   }
-};
-
-const onSubmitMetricaExercicioInicio = async (exercicio: PrimeVueDataExercicio) => {
-  try {
-    await fetch(useRuntimeConfig().public.BACKEND_API_URL + '/v1/metricas_exercicio', {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + $authService.getToken()
-      },
-      body: JSON.stringify({
-        exercicio_id: exercicio.id,
-        tipo_metrica: useRuntimeConfig().public.METRICAS.INICIO
-      })
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-onMounted(async () => {
-  if (route.params.id && Array.isArray(route.params.id)) {
-    idLista.value = route.params.id[0];
-    currentStep.value = Number(route.params.id[1]) || 0;
-  }
-  await getExerciciosHabilitadosByLista();
-});
+}
+watch(
+  () => route.params.id,
+  () => {
+    currentStep.value = Math.max(
+      0,
+      Math.floor(Number(Array.isArray(route.params.id) ? route.params.id[1] : 0) || 0)
+    );
+    loadList();
+  },
+  { immediate: true }
+);
 </script>

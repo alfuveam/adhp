@@ -21,8 +21,10 @@
         class="flex flex-col gap-4"
       >
         <div class="flex flex-col gap-1.5">
-          <label class="text-sm font-semibold text-slate-600">E-mail</label>
+          <label for="login-email" class="text-sm font-semibold text-slate-600">E-mail</label>
           <InputText
+            id="login-email"
+            autocomplete="email"
             v-model="initialValues.email"
             name="email"
             type="email"
@@ -42,8 +44,10 @@
         </div>
 
         <div class="flex flex-col gap-1.5">
-          <label class="text-sm font-semibold text-slate-600">Senha</label>
+          <label for="login-password" class="text-sm font-semibold text-slate-600">Senha</label>
           <Password
+            inputId="login-password"
+            autocomplete="current-password"
             v-model="initialValues.password"
             name="password"
             placeholder="Sua senha"
@@ -70,9 +74,11 @@
 
         <button
           type="submit"
+          :disabled="submitting"
+          :aria-busy="submitting"
           class="study-btn-primary w-full mt-2 py-3 rounded-lg text-sm font-semibold"
         >
-          <span>Entrar na Conta</span>
+          <span>{{ submitting ? 'Entrando…' : 'Entrar na conta' }}</span>
           <i class="pi pi-arrow-right text-sm"></i>
         </button>
       </Form>
@@ -92,7 +98,6 @@
   </div>
 </template>
 
-
 <script setup lang="ts">
 import { ref } from 'vue';
 import { zodResolver } from '@primevue/forms/resolvers/zod';
@@ -101,6 +106,7 @@ import { useToast } from 'primevue/usetoast';
 
 const { $authService } = useNuxtApp();
 const toast = useToast();
+const submitting = ref(false);
 
 interface LoginToken {
   token: string;
@@ -108,7 +114,7 @@ interface LoginToken {
 
 const initialValues = ref({
   email: '',
-  password: ''
+  password: '',
 });
 
 const resolver = zodResolver(
@@ -117,24 +123,27 @@ const resolver = zodResolver(
     password: z
       .string()
       .min(3, { message: 'Mínimo de 3 caracteres.' })
-      .max(15, { message: 'Máximo de 15 caracteres.' })
+      .max(15, { message: 'Máximo de 15 caracteres.' }),
   })
 );
 
 const onFormSubmit = async (e: any) => {
-  if (e.valid) {
-    toast.add({ severity: 'info', summary: 'Autenticando...', life: 2000 });
+  if (!e.valid || submitting.value) return;
+  submitting.value = true;
+  try {
+    await sendLogin();
+  } finally {
+    submitting.value = false;
   }
-  await sendLogin();
 };
 
 async function sendLogin() {
   try {
     const config = useRuntimeConfig();
-    const response = await fetch(config.public.BACKEND_API_URL + "/v1/login", {
-      method: "POST",
+    const response = await fetch(config.public.BACKEND_API_URL + '/v1/login', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         email: initialValues.value.email,
@@ -157,11 +166,21 @@ async function sendLogin() {
         }
       }
     } else {
-      toast.add({ severity: 'error', summary: 'Falha no login', detail: 'Verifique seu e-mail e senha.', life: 3000 });
+      toast.add({
+        severity: 'error',
+        summary: 'Falha no login',
+        detail: 'Verifique seu e-mail e senha.',
+        life: 3000,
+      });
     }
   } catch (error) {
     console.error(error);
-    toast.add({ severity: 'error', summary: 'Erro de conexão', detail: 'Não foi possível conectar ao servidor.', life: 3000 });
+    toast.add({
+      severity: 'error',
+      summary: 'Erro de conexão',
+      detail: 'Não foi possível conectar ao servidor.',
+      life: 3000,
+    });
   }
 }
 </script>

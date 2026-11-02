@@ -18,23 +18,44 @@
         </div>
 
         <div class="flex items-center gap-3 shrink-0">
-          <div
-            class="px-4 py-2.5 text-center min-w-[80px]"
-          >
+          <div class="px-4 py-2.5 text-center min-w-[80px]">
             <div class="text-[11px] text-slate-600 font-medium">Trilhas</div>
-            <div class="text-xl font-semibold text-slate-800">{{ trilhas?.length || 0 }}</div>
+            <div class="text-xl font-semibold text-slate-800">
+              {{ loadingTrilhas || trilhasError ? '—' : trilhas.length }}
+            </div>
           </div>
-          <div
-            class="px-4 py-2.5 text-center min-w-[80px]"
-          >
+          <div class="px-4 py-2.5 text-center min-w-[80px]">
             <div class="text-[11px] text-sky-800 font-medium">Revisões agendadas</div>
             <div class="text-xl font-semibold text-sky-800">
-              {{ exerciciosRepeticao?.length || 0 }}
+              {{ loadingReviews || reviewsError ? '—' : exerciciosRepeticao.length }}
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <section
+      v-if="!loadingTrilhas && !trilhasError && nextActivity"
+      class="study-card p-5 sm:p-6 flex flex-wrap items-center justify-between gap-4"
+      aria-label="Próximo exercício"
+    >
+      <div class="min-w-0">
+        <p class="text-sm text-slate-600">Seu próximo passo · {{ nextActivity.context }}</p>
+        <h2 class="mt-1 text-lg font-semibold break-words">{{ nextActivity.name }}</h2>
+      </div>
+      <NuxtLink :to="nextActivity.to" class="study-btn-primary px-5 py-3 text-sm"
+        >{{ hasCompletedExercise ? 'Continuar de onde parei' : 'Começar a praticar' }}
+        <i class="pi pi-arrow-right" aria-hidden="true"></i
+      ></NuxtLink>
+    </section>
+    <p
+      v-else-if="!loadingTrilhas && !trilhasError && hasCompletedExercise"
+      class="text-sm text-slate-600"
+      role="status"
+    >
+      Você concluiu os exercícios disponíveis. Retome uma lista para praticar novamente ou confira
+      suas revisões.
+    </p>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
       <div class="lg:col-span-7 space-y-4">
@@ -46,8 +67,21 @@
           <span class="study-badge study-badge-purple text-[10px]">Passo a passo</span>
         </div>
 
+        <p v-if="loadingTrilhas" role="status" class="study-card p-6 text-sm text-slate-600">
+          Carregando suas trilhas…
+        </p>
+        <div v-else-if="trilhasError" role="alert" class="study-card p-6 space-y-3">
+          <p>{{ trilhasError }}</p>
+          <button
+            type="button"
+            class="study-btn-secondary px-4 py-2 text-sm"
+            @click="getTrilhasListaExercicios"
+          >
+            Tentar carregar trilhas novamente
+          </button>
+        </div>
         <div
-          v-if="!trilhas || trilhas.length === 0"
+          v-else-if="trilhas.length === 0"
           class="study-card p-10 text-center border-[#dce1d9] bg-[#ffffff]"
         >
           <p class="text-slate-600 text-sm">
@@ -71,12 +105,12 @@
                       : 'bg-amber-400/20 text-amber-800 border border-amber-400/30'
                   "
                 >
-                  {{ trilha.tipo_da_linguagem === 1 ? "Go" : "Py" }}
+                  {{ trilha.tipo_da_linguagem === 1 ? 'Go' : 'Py' }}
                 </span>
                 <div>
                   <h3 class="text-lg font-semibold text-slate-800">{{ trilha.name }}</h3>
                   <span class="text-sm text-slate-600 font-medium">
-                    {{ trilha.tipo_da_linguagem === 1 ? "Golang" : "Python" }} •
+                    {{ trilha.tipo_da_linguagem === 1 ? 'Golang' : 'Python' }} •
                     {{ trilha.listas?.length || 0 }} Listas de Exercícios
                   </span>
                 </div>
@@ -107,12 +141,11 @@
                           <template #body="{ node }">
                             <div class="flex items-center gap-2 py-1.5">
                               <i
-                                :class="
-                                  node.data.habilitado
-                                    ? 'pi pi-check text-emerald-700 font-semibold'
-                                    : 'pi pi-lock text-slate-500'
-                                "
-                                class="text-sm"
+                                :class="[
+                                  exerciseStatus(node.data).icon,
+                                  exerciseStatus(node.data).color,
+                                ]"
+                                aria-hidden="true"
                               ></i>
                               <span
                                 :class="
@@ -122,6 +155,11 @@
                                 "
                               >
                                 {{ node.data.name }}
+                                <small
+                                  class="block text-xs font-normal"
+                                  :class="exerciseStatus(node.data).color"
+                                  >{{ exerciseStatus(node.data).label }}</small
+                                >
                               </span>
                             </div>
                           </template>
@@ -132,14 +170,17 @@
                             <div class="flex justify-end">
                               <NuxtLink
                                 v-if="node.data.habilitado"
-                                :to="`/dashboard_discente/exercicio/lista/${lista.id}/${
-                                  node.data.order_index - 1
-                                }/${trilha.tipo_da_linguagem}`"
+                                :to="`/dashboard_discente/exercicio/lista/${
+                                  lista.id
+                                }/${lista.exercicios.findIndex(
+                                  (item) => item.data.id === node.data.id
+                                )}/${trilha.tipo_da_linguagem}`"
+                                class="study-btn-primary px-3 py-1.5 text-sm"
+                                :aria-label="`${
+                                  node.data.codigo_rodou ? 'Praticar novamente' : 'Resolver'
+                                }: ${node.data.name}`"
+                                >{{ node.data.codigo_rodou ? 'Praticar' : 'Resolver' }}</NuxtLink
                               >
-                                <button class="study-btn-primary px-3 py-1.5 text-sm">
-                                  Resolver
-                                </button>
-                              </NuxtLink>
                               <span v-else class="text-sm text-slate-500 font-medium">
                                 Bloqueado
                               </span>
@@ -152,12 +193,12 @@
                         <NuxtLink
                           :to="`/dashboard_discente/exercicio/lista/${lista.id}/0/${trilha.tipo_da_linguagem}`"
                         >
-                          <button
+                          <span
                             class="study-btn-secondary px-3.5 py-1.5 text-sm flex items-center gap-1.5"
                           >
                             <i class="pi pi-play text-[10px]"></i>
                             <span>Começar esta lista</span>
-                          </button>
+                          </span>
                         </NuxtLink>
                       </div>
                     </div>
@@ -178,8 +219,21 @@
             </h2>
           </div>
 
+          <p v-if="loadingReviews" role="status" class="py-6 text-sm text-slate-600">
+            Carregando suas revisões…
+          </p>
+          <div v-else-if="reviewsError" role="alert" class="space-y-3">
+            <p>{{ reviewsError }}</p>
+            <button
+              type="button"
+              class="study-btn-secondary px-4 py-2 text-sm"
+              @click="getExerciciosRepeticao"
+            >
+              Tentar carregar revisões novamente
+            </button>
+          </div>
           <div
-            v-if="!exerciciosRepeticao || exerciciosRepeticao.length === 0"
+            v-else-if="exerciciosRepeticao.length === 0"
             class="py-8 text-center text-slate-600 space-y-1.5"
           >
             <div
@@ -211,26 +265,21 @@
                       : 'bg-emerald-500/15 text-emerald-800 border border-emerald-500/30'
                   "
                 >
-                  {{ verificaSePodeRepetir(rep) ? "Aguardando" : "Liberado" }}
+                  {{ verificaSePodeRepetir(rep) ? 'Aguardando' : 'Liberado' }}
                 </span>
               </div>
 
               <div class="flex items-center justify-between text-[11px] text-slate-600 pt-1">
                 <span class="font-mono text-sky-800">Próxima: {{ rep.proxima_repeticao }}</span>
 
-                <NuxtLink :to="`/dashboard_discente/exercicio/repetir/${rep.id}`">
-                  <button
-                    :disabled="verificaSePodeRepetir(rep)"
-                    class="transition"
-                    :class="
-                      verificaSePodeRepetir(rep)
-                        ? 'px-3 py-1 rounded-lg text-sm font-semibold bg-[#ffffff] text-slate-500 border border-[#dce1d9] cursor-not-allowed'
-                        : 'study-btn-emerald px-3.5 py-1 text-sm'
-                    "
-                  >
-                    Revisar
-                  </button>
-                </NuxtLink>
+                <NuxtLink
+                  v-if="!verificaSePodeRepetir(rep)"
+                  :to="`/dashboard_discente/exercicio/repetir/${rep.id}`"
+                  class="study-btn-emerald px-3.5 py-1 text-sm"
+                  :aria-label="`Revisar: ${rep.descricao_exercicio}`"
+                  >Revisar</NuxtLink
+                >
+                <span v-else class="text-xs text-slate-500">Disponível na data indicada</span>
               </div>
             </div>
           </div>
@@ -311,102 +360,81 @@
   </div>
 </template>
 
-
 <script setup lang="ts">
-definePageMeta({
-    middleware: 'auth-discente'
-});
-
-import { ref } from 'vue';
 import type { Trilha } from '~/types';
-import { zodResolver } from '@primevue/forms/resolvers/zod';
-import { z } from 'zod';
-import { useToast } from 'primevue/usetoast';
+import { exerciseStatus, nextExercise } from '~/utils/learning';
 import ChartRepeticaoEspacada from '@/components/ChartRepeticaoEspacada.vue';
-
-const trilhas = ref<Trilha[]>([]);
+definePageMeta({ middleware: 'auth-discente' });
 const { $authService } = useNuxtApp();
-
+const trilhas = ref<Trilha[]>([]);
 interface ExerciciosRepeticao {
   id: string;
   descricao_exercicio: string;
-  ultima_repeticao: string;
   proxima_repeticao: string;
-  id_exercicio: string;
 }
-
 const exerciciosRepeticao = ref<ExerciciosRepeticao[]>([]);
-const toast = useToast();
 const v_mode_tempo_da_repeticao = ref('');
-
-const initialValues = ref({
-  tempo_da_repeticao: ''
+const loadingTrilhas = ref(true);
+const loadingReviews = ref(true);
+const trilhasError = ref('');
+const reviewsError = ref('');
+const nextActivity = computed(() => nextExercise(trilhas.value));
+const hasCompletedExercise = computed(() =>
+  trilhas.value.some((t) => t.listas?.some((l) => l.exercicios?.some((e) => e.data.codigo_rodou)))
+);
+async function getTrilhasListaExercicios() {
+  if (import.meta.server) return;
+  loadingTrilhas.value = true;
+  trilhasError.value = '';
+  try {
+    const response = await fetch(
+      useRuntimeConfig().public.BACKEND_API_URL + '/v1/dashboard_discente',
+      {
+        signal: AbortSignal.timeout(20000),
+        headers: { Authorization: 'Bearer ' + $authService.getToken() },
+      }
+    );
+    if (!response.ok) throw new Error('request');
+    const data = await response.json();
+    if (data.trilhas != null && !Array.isArray(data.trilhas)) throw new Error('response');
+    trilhas.value = data.trilhas || [];
+    v_mode_tempo_da_repeticao.value = String(data.id_tempo_repeticao || '');
+  } catch {
+    trilhasError.value = 'Não foi possível carregar suas trilhas. Tente novamente.';
+  } finally {
+    loadingTrilhas.value = false;
+  }
+}
+async function getExerciciosRepeticao() {
+  if (import.meta.server) return;
+  loadingReviews.value = true;
+  reviewsError.value = '';
+  try {
+    const response = await fetch(
+      useRuntimeConfig().public.BACKEND_API_URL + '/v1/exercicios_repeticao_by_user',
+      {
+        signal: AbortSignal.timeout(20000),
+        headers: { Authorization: 'Bearer ' + $authService.getToken() },
+      }
+    );
+    if (!response.ok) throw new Error('request');
+    const data = await response.json();
+    if (data != null && !Array.isArray(data)) throw new Error('response');
+    exerciciosRepeticao.value = data || [];
+  } catch {
+    reviewsError.value = 'Não foi possível carregar suas revisões. Tente novamente.';
+  } finally {
+    loadingReviews.value = false;
+  }
+}
+const now = ref(Date.now());
+let clock: ReturnType<typeof setInterval>;
+const verificaSePodeRepetir = (rep: ExerciciosRepeticao) =>
+  new Date(rep.proxima_repeticao).getTime() > now.value;
+onMounted(() => {
+  getTrilhasListaExercicios();
+  getExerciciosRepeticao();
+  clock = setInterval(() => (now.value = Date.now()), 30000);
 });
-
-const resolver = ref(zodResolver(
-  z.object({
-    tempo_da_repeticao: z.string().min(1, { message: 'Tempo da repetição.' })
-  })
-));
-
-const onFormSubmit = async ({ valid }: { valid: boolean }) => {
-  if (valid) {
-    // Optional submission endpoint
-  }
-};
-
-const getTrilhasListaExercicios = async () => {
-  try {
-    const config = useRuntimeConfig();
-    const response = await fetch(config.public.BACKEND_API_URL + '/v1/dashboard_discente', {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + $authService.getToken()
-      }
-    });
-
-    if (response.ok) {
-      const resData = await response.json();
-      trilhas.value = resData.trilhas;
-      if (resData.id_tempo_repeticao) {
-        v_mode_tempo_da_repeticao.value = resData.id_tempo_repeticao.toString();
-        initialValues.value.tempo_da_repeticao = resData.id_tempo_repeticao.toString();
-      }
-    } else {
-      toast.add({ severity: 'error', summary: 'Erro ao carregar trilhas', detail: 'Falha ao buscar dados do painel.', life: 3000 });
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-const getExerciciosRepeticao = async () => {
-  try {
-    const config = useRuntimeConfig();
-    const response = await fetch(config.public.BACKEND_API_URL + '/v1/exercicios_repeticao_by_user', {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + $authService.getToken()
-      }
-    });
-
-    if (response.ok) {
-      exerciciosRepeticao.value = await response.json();
-    }
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const verificaSePodeRepetir = (repeticao: ExerciciosRepeticao) => {
-  if (!repeticao.proxima_repeticao) return false;
-  const date = new Date(repeticao.proxima_repeticao);
-  const now = new Date();
-  return date.getTime() > now.getTime();
-};
-
-getTrilhasListaExercicios();
-getExerciciosRepeticao();
+onUnmounted(() => clearInterval(clock));
 </script>

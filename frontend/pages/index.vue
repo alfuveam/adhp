@@ -32,7 +32,7 @@
           <div class="run">
             <span>2 linhas. Um começo.</span
             ><button class="button" type="button" @click="exampleExecuted = true">
-              {{ exampleExecuted ? "Ver resultado novamente ↻" : "Ver resultado ▷" }}
+              {{ exampleExecuted ? 'Ver resultado novamente ↻' : 'Ver resultado ▷' }}
             </button>
           </div>
           <div class="output" v-if="exampleExecuted" id="result" role="status">
@@ -73,6 +73,77 @@
             Retome os exercícios nas revisões para praticar novamente e fortalecer seu aprendizado.
           </p>
         </article>
+      </div>
+    </section>
+    <section class="resources" id="recursos" aria-labelledby="resources-title">
+      <div class="section-top">
+        <h2 id="resources-title">Além de escrever código.</h2>
+        <p>Ferramentas para acompanhar cada tentativa.</p>
+      </div>
+      <div class="resources-grid">
+        <dl class="feature-list">
+          <div>
+            <dt>Um editor no próprio navegador</dt>
+            <dd>
+              Abra o exercício e escreva sua solução ali mesmo. O editor destaca a sintaxe de Python
+              e Go para ajudar na leitura do código.
+            </dd>
+          </div>
+          <div>
+            <dt>Verificações para entender sua solução</dt>
+            <dd>
+              Teste o programa e confira sua saída. Quando algo não funcionar, veja uma orientação
+              inicial e abra os detalhes técnicos para investigar.
+            </dd>
+          </div>
+          <div>
+            <dt>Uma dica quando você precisar</dt>
+            <dd>
+              Consulte as dicas cadastradas pelo professor para encontrar um próximo caminho, sem
+              sair do exercício.
+            </dd>
+          </div>
+          <div>
+            <dt>Seu progresso como ponto de partida</dt>
+            <dd>
+              Distinga o que já concluiu do que está disponível e continue pelo próximo exercício.
+              As atividades seguintes são liberadas conforme você avança.
+            </dd>
+          </div>
+        </dl>
+        <aside class="learning-preview" aria-label="Exemplos dos recursos do ambiente">
+          <p class="preview-label">Durante a prática</p>
+          <h3>Uma tentativa também mostra o que estudar.</h3>
+          <p>
+            O resultado ajuda você a decidir o próximo ajuste. As mensagens técnicas continuam
+            disponíveis para consulta.
+          </p>
+          <div class="guidance-example">
+            <span>Exemplo de orientação</span>
+            <strong>Vamos ajustar sua solução</strong>
+            <p>
+              Confira os espaços no início das linhas. Linhas do mesmo bloco precisam ter o mesmo
+              recuo.
+            </p>
+          </div>
+          <div class="progress-example">
+            <span>Na sua lista de exercícios</span>
+            <ul>
+              <li>
+                <i class="pi pi-check-circle" aria-hidden="true"></i
+                ><span>Concluído<small>Solução aprovada nas verificações</small></span>
+              </li>
+              <li>
+                <i class="pi pi-play-circle" aria-hidden="true"></i
+                ><span>Disponível<small>Pronto para você tentar</small></span>
+              </li>
+              <li>
+                <i class="pi pi-lock" aria-hidden="true"></i
+                ><span>Bloqueado<small>Conclua os anteriores para avançar</small></span>
+              </li>
+            </ul>
+          </div>
+        </aside>
       </div>
     </section>
     <section class="practice" id="trilhas">
@@ -118,11 +189,86 @@
         </aside>
       </div>
     </section>
+    <section class="teacher-section" aria-labelledby="teacher-title">
+      <div class="teacher-intro">
+        <p class="eyebrow">Para quem ensina</p>
+        <h2 id="teacher-title">Prepare o caminho de quem está aprendendo.</h2>
+        <p>
+          Organize a prática da sua turma com trilhas, listas e exercícios de Python e Go. Você
+          define as atividades e as verificações de cada solução.
+        </p>
+        <NuxtLink
+          class="textlink"
+          :to="
+            isAuthenticated
+              ? $authService.isDocente()
+                ? '/dashboard_docente'
+                : '/dashboard_discente'
+              : '/account/login'
+          "
+          >{{ isAuthenticated ? 'Acessar meu painel' : 'Já tenho acesso de professor' }}
+          <span aria-hidden="true">→</span></NuxtLink
+        >
+      </div>
+      <dl class="teacher-features">
+        <div>
+          <dt>Organize a sequência de estudo</dt>
+          <dd>Crie e edite trilhas, reúna exercícios em listas e ajuste a ordem das atividades.</dd>
+        </div>
+        <div>
+          <dt>Defina o ponto de partida e os testes</dt>
+          <dd>
+            Prepare o código inicial e os testes que vão verificar as soluções enviadas pelos
+            estudantes.
+          </dd>
+        </div>
+        <div>
+          <dt>Cadastre dicas para as tentativas</dt>
+          <dd>
+            Adicione orientações aos exercícios para apoiar quem precisar de ajuda durante a
+            prática.
+          </dd>
+        </div>
+      </dl>
+    </section>
+    <section class="questions" aria-labelledby="questions-title">
+      <h2 id="questions-title">Antes de começar</h2>
+      <details>
+        <summary>Preciso instalar um editor no computador?</summary>
+        <p>
+          Para resolver as atividades do ADHP, você usa o editor da própria página. O código é
+          enviado para execução e verificação pelo ambiente.
+        </p>
+      </details>
+      <details>
+        <summary>O que acontece se eu errar um exercício?</summary>
+        <p>
+          Você pode ler o retorno da tentativa, consultar uma dica disponível, ajustar o código e
+          testar novamente. O exercício é marcado como concluído quando sua solução passa pelas
+          verificações.
+        </p>
+      </details>
+      <details>
+        <summary>Como funcionam as revisões?</summary>
+        <p>
+          Depois de concluir exercícios, você pode retomá-los nas revisões espaçadas. O painel
+          mostra as atividades agendadas e quando cada uma fica disponível para revisar.
+        </p>
+      </details>
+      <details>
+        <summary>Posso começar sem conhecer Python ou Go?</summary>
+        <p>
+          O ambiente tem foco em quem está iniciando na programação. As atividades são organizadas
+          pelo professor; siga a sequência da sua trilha e use as dicas disponíveis ao longo do
+          caminho.
+        </p>
+      </details>
+    </section>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from "vue";
+import { ref, watch, onMounted } from 'vue';
 
 const route = useRoute();
 const isAuthenticated = ref(false);
@@ -131,16 +277,16 @@ const { $authService } = useNuxtApp();
 
 const redirectToDashboard = () => {
   if ($authService.isDocente()) {
-    navigateTo("/dashboard_docente");
+    navigateTo('/dashboard_docente');
   } else if ($authService.isDiscente()) {
-    navigateTo("/dashboard_discente");
+    navigateTo('/dashboard_discente');
   }
 };
 
 const checkIsAuthenticated = () => {
   if ($authService.isAuthenticated()) {
     try {
-      const jwtPayload = $authService.parseJwt($authService.getToken() || "");
+      const jwtPayload = $authService.parseJwt($authService.getToken() || '');
       if (jwtPayload && jwtPayload.exp && jwtPayload.exp < Date.now() / 1000) {
         $authService.logout();
       }
@@ -425,6 +571,168 @@ h2 {
   }
   .aside {
     margin-bottom: 10px;
+  }
+}
+
+.resources {
+  border-top: 1px solid #dce0d7;
+  padding: 42px 0 56px;
+}
+.resources-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 76px;
+  align-items: start;
+}
+.feature-list > div {
+  padding: 20px 0;
+  border-bottom: 1px solid #dce0d7;
+}
+.feature-list > div:first-child {
+  padding-top: 0;
+}
+.feature-list dt,
+.teacher-features dt {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.feature-list dd,
+.teacher-features dd {
+  font-size: 15px;
+  line-height: 1.75;
+  color: #65706b;
+  margin: 0;
+}
+.learning-preview {
+  padding: 26px;
+  background: #fff;
+  border: 1px solid #dce0d7;
+  border-radius: 10px;
+}
+.preview-label {
+  font-size: 12px;
+  color: #285b75;
+  margin-bottom: 12px;
+}
+.learning-preview h3 {
+  font-size: 21px;
+  line-height: 1.4;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+  margin-bottom: 12px;
+}
+.learning-preview > p:not(.preview-label),
+.guidance-example p {
+  font-size: 14px;
+  color: #65706b;
+}
+.guidance-example {
+  border-left: 3px solid #87601d;
+  background: #faf8f2;
+  padding: 14px 16px;
+  margin: 22px 0;
+}
+.guidance-example > span,
+.progress-example > span {
+  display: block;
+  font-size: 12px;
+  color: #65706b;
+  margin-bottom: 9px;
+}
+.guidance-example strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+.guidance-example p {
+  margin-top: 8px;
+}
+.progress-example ul {
+  display: grid;
+  gap: 15px;
+}
+.progress-example li {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  font-size: 14px;
+}
+.progress-example i {
+  margin-top: 4px;
+  color: #285b75;
+}
+.progress-example li:first-child i {
+  color: #326449;
+}
+.progress-example li:last-child i {
+  color: #65706b;
+}
+.progress-example small {
+  display: block;
+  color: #65706b;
+  font-size: 12px;
+  margin-top: 2px;
+}
+.teacher-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 76px;
+  background: #edf1eb;
+  border-radius: 10px;
+  padding: 40px;
+  margin: 16px 0 58px;
+}
+.teacher-intro h2 {
+  margin: 14px 0 18px;
+  line-height: 1.3;
+}
+.teacher-intro > p:not(.eyebrow) {
+  color: #65706b;
+  font-size: 15px;
+}
+.teacher-intro .textlink {
+  display: inline-block;
+  margin-top: 24px;
+  color: #285b75;
+}
+.teacher-features {
+  display: grid;
+  gap: 24px;
+}
+.teacher-features dt {
+  font-size: 16px;
+}
+.questions {
+  padding-bottom: 20px;
+  max-width: 820px;
+}
+.questions details {
+  border-top: 1px solid #dce0d7;
+  padding: 18px 0;
+}
+.questions summary {
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 16px;
+}
+.questions details p {
+  color: #65706b;
+  font-size: 15px;
+  margin: 14px 0 0 16px;
+  line-height: 1.8;
+}
+@media (max-width: 760px) {
+  .resources-grid,
+  .teacher-section {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  .teacher-section {
+    padding: 25px;
+    margin-bottom: 40px;
+  }
+  .learning-preview {
+    padding: 22px;
   }
 }
 </style>
