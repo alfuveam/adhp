@@ -1,10 +1,275 @@
+@import "primeicons/primeicons.css";
 @layer tailwind-base, primevue, tailwind-utilities;
 
 @layer tailwind-base {
     @tailwind base;
+
+    html {
+      font-family: 'Plus Jakarta Sans', Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color-scheme: dark;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: #131528;
+      color: #f0f3fc;
+      overflow-x: hidden;
+      font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
 }
 
 @layer tailwind-utilities {
     @tailwind components;
     @tailwind utilities;
+}
+
+/* Custom sleek scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #131528;
+}
+::-webkit-scrollbar-thumb {
+  background: #2e3458;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #444c7e;
+}
+
+/* Mimo Design System: Rich Midnight Indigo Palette */
+.mimo-bg {
+  background-color: #0e1020;
+}
+
+.mimo-card {
+  background-color: #171a30;
+  border: 1px solid #282f52;
+  border-radius: 1.25rem;
+  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.45);
+}
+
+.mimo-card-interactive {
+  background-color: #171a30;
+  border: 1px solid #282f52;
+  border-radius: 1.25rem;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.mimo-card-interactive:hover {
+  background-color: #1e223e;
+  border-color: #4b5588;
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.55);
+}
+
+/* Signature Mimo Tactile 3D Buttons */
+.mimo-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #7c4ed4;
+  color: #ffffff;
+  font-weight: 700;
+  border-radius: 0.875rem;
+  border-bottom: 3.5px solid #562ea4;
+  transition: all 0.1s ease-in-out;
+  user-select: none;
+  cursor: pointer;
+}
+.mimo-btn-primary:hover {
+  background-color: #8b5cf6;
+  border-bottom-color: #6536bf;
+  transform: translateY(-1px);
+}
+.mimo-btn-primary:active {
+  transform: translateY(2px);
+  border-bottom-width: 1px;
+}
+
+.mimo-btn-blue {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #0284c7;
+  color: #ffffff;
+  font-weight: 700;
+  border-radius: 0.875rem;
+  border-bottom: 3.5px solid #0369a1;
+  transition: all 0.1s ease-in-out;
+  user-select: none;
+  cursor: pointer;
+}
+.mimo-btn-blue:hover {
+  background-color: #0ea5e9;
+  border-bottom-color: #0284c7;
+  transform: translateY(-1px);
+}
+.mimo-btn-blue:active {
+  transform: translateY(2px);
+  border-bottom-width: 1px;
+}
+
+.mimo-btn-emerald {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #10b981;
+  color: #ffffff;
+  font-weight: 700;
+  border-radius: 0.875rem;
+  border-bottom: 3.5px solid #059669;
+  transition: all 0.1s ease-in-out;
+  user-select: none;
+  cursor: pointer;
+}
+.mimo-btn-emerald:hover {
+  background-color: #34d399;
+  border-bottom-color: #10b981;
+  transform: translateY(-1px);
+}
+.mimo-btn-emerald:active {
+  transform: translateY(2px);
+  border-bottom-width: 1px;
+}
+
+.mimo-btn-amber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #f59e0b;
+  color: #0f172a;
+  font-weight: 800;
+  border-radius: 0.875rem;
+  border-bottom: 3.5px solid #b45309;
+  transition: all 0.1s ease-in-out;
+  user-select: none;
+  cursor: pointer;
+}
+.mimo-btn-amber:hover {
+  background-color: #fbbf24;
+  border-bottom-color: #d97706;
+  transform: translateY(-1px);
+}
+.mimo-btn-amber:active {
+  transform: translateY(2px);
+  border-bottom-width: 1px;
+}
+
+.mimo-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #212642;
+  color: #f1f5f9;
+  font-weight: 600;
+  border-radius: 0.875rem;
+  border: 1px solid #363d66;
+  border-bottom: 3.5px solid #16192e;
+  transition: all 0.1s ease-in-out;
+  user-select: none;
+  cursor: pointer;
+}
+.mimo-btn-secondary:hover {
+  background-color: #2b3256;
+  color: #ffffff;
+  border-color: #4a548c;
+  transform: translateY(-1px);
+}
+.mimo-btn-secondary:active {
+  transform: translateY(2px);
+  border-bottom-width: 1px;
+}
+
+/* Badges */
+.mimo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.025em;
+}
+
+.mimo-badge-purple {
+  background: rgba(141, 96, 226, 0.18);
+  color: #c7b0f6;
+  border: 1px solid rgba(141, 96, 226, 0.35);
+}
+
+.mimo-badge-blue {
+  background: rgba(30, 150, 255, 0.16);
+  color: #92cdff;
+  border: 1px solid rgba(30, 150, 255, 0.35);
+}
+
+.mimo-badge-amber {
+  background: rgba(251, 171, 123, 0.16);
+  color: #fcd5be;
+  border: 1px solid rgba(251, 171, 123, 0.35);
+}
+
+.mimo-badge-emerald {
+  background: rgba(52, 168, 83, 0.16);
+  color: #a4e5b7;
+  border: 1px solid rgba(52, 168, 83, 0.35);
+}
+
+.mimo-badge-indigo {
+  background: rgba(124, 78, 212, 0.18);
+  color: #d1bdf9;
+  border: 1px solid rgba(124, 78, 212, 0.35);
+}
+
+/* PrimeVue Components Overrides (Matching Mimo Surface) */
+.p-accordionheader {
+  background: #1d223f !important;
+  border-radius: 0.875rem !important;
+  border: 1px solid #2b3358 !important;
+  color: #f1f5f9 !important;
+  font-weight: 700 !important;
+  padding: 0.95rem 1.35rem !important;
+  transition: background-color 0.15s ease !important;
+}
+.p-accordionheader:hover {
+  background: #232a4e !important;
+}
+.p-accordionpanel {
+  margin-bottom: 0.75rem !important;
+  border: none !important;
+}
+.p-accordioncontent-content {
+  background: #14172c !important;
+  border: 1px solid #2b3358 !important;
+  border-top: none !important;
+  border-bottom-left-radius: 0.875rem !important;
+  border-bottom-right-radius: 0.875rem !important;
+}
+.p-treetable {
+  background: transparent !important;
+}
+.p-treetable .p-treetable-tbody > tr {
+  background: transparent !important;
+  border-bottom: 1px solid #222847 !important;
+}
+.p-inputtext, .p-password-input {
+  background: #0f1122 !important;
+  border: 1px solid #272e50 !important;
+  color: #f8fafc !important;
+  border-radius: 0.75rem !important;
+  transition: all 0.15s ease !important;
+}
+.p-inputtext:focus, .p-password-input:focus {
+  border-color: #7c4ed4 !important;
+  box-shadow: 0 0 0 2px rgba(124, 78, 212, 0.25) !important;
 }

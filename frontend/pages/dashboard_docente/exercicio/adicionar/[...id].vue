@@ -1,85 +1,183 @@
 <template>
-  <div class="card flex justify-center">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
     <Toast />
-    <ConfirmDialog></ConfirmDialog>
+    <ConfirmDialog />
 
-    <Form v-slot="$form" :valoresIniciais :resolver @submit="onFormSubmit" class="flex flex-col gap-4 w-full sm:w-2/3">
-      <div class="flex flex-col gap-1">
-          <label for="multiple-ac-1" class="font-bold mb-2 block">Título exercício</label>
-          <InputText name="titulo_exercicio" v-model="valoresIniciais.titulo_exercicio" type="text" placeholder="Título exercício" fluid />
-          <Message v-if="$form.titulo_exercicio?.invalid" severity="error" size="small" variant="simple">{{ $form.titulo_exercicio.error?.message }}</Message>
+    <!-- Top Navigation -->
+    <div class="flex items-center justify-between pb-2 border-b border-white/[0.08]">
+      <NuxtLink 
+        to="/dashboard_docente" 
+        class="inline-flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-white transition"
+      >
+        <i class="pi pi-arrow-left text-xs"></i>
+        <span>Voltar ao Painel Docente</span>
+      </NuxtLink>
+
+      <span class="mimo-badge mimo-badge-indigo text-[11px]">
+        {{ tipoDaLinguagem === 1 ? 'Linguagem Golang' : 'Linguagem Python' }}
+      </span>
+    </div>
+
+    <!-- Header Card -->
+    <div class="mimo-card p-6 sm:p-7 border-[#363e66] bg-[#1c2038] shadow-xl space-y-1.5">
+      <h1 class="text-2xl font-extrabold text-white tracking-tight">
+        Cadastrar Novo Exercício
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+        Defina o enunciado, o código base com boilerplate e a suíte de testes unitários para avaliação automática.
+      </p>
+    </div>
+
+    <!-- Form -->
+    <Form 
+      v-slot="$form" 
+      :initialValues="valoresIniciais" 
+      :resolver="resolver" 
+      @submit="onFormSubmit" 
+      class="flex flex-col gap-6"
+    >
+      <!-- Título do Exercício -->
+      <div class="mimo-card p-6 border-[#363e66] bg-[#1c2038] shadow-xl flex flex-col gap-2">
+        <label class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+          <i class="pi pi-bookmark text-purple-400 text-xs"></i>
+          <span>Título do Exercício</span>
+        </label>
+        <InputText 
+          name="titulo_exercicio" 
+          v-model="valoresIniciais.titulo_exercicio" 
+          type="text" 
+          placeholder="Ex: Soma de Elementos em uma Lista" 
+          class="w-full !p-3 !bg-[#15172a] !border-[#363e66] focus:!border-[#7c4ed4] rounded-xl text-sm"
+          fluid 
+        />
+        <Message v-if="$form.titulo_exercicio?.invalid" severity="error" size="small" variant="simple" class="!text-xs !text-rose-400 mt-1">
+          {{ $form.titulo_exercicio.error?.message }}
+        </Message>
       </div>
-      <div class="flex flex-col gap-1">
-        <label for="multiple-ac-1" class="font-bold mb-2 block">Código Base</label>
-        <MonacoEditor name="codigo_base" v-model="valoresIniciais.codigo_base" :options="optionsEditor" :lang="tipoDaLinguagem == 1 ? 'go' : 'python'" class="h-[600px] z-10" />
-        <!-- <Editor name="codigo_base" v-model="valoresIniciais.codigo_base" editorStyle="height: 220px" spellcheck="false" ref="refQuillCodigoBase">
-          <template v-slot:toolbar>
-            <span class="ql-formats">
-              <button v-tooltip.bottom="'Bold'" class="ql-bold"></button>
-              <button v-tooltip.bottom="'Italic'" class="ql-italic"></button>
-              <button v-tooltip.bottom="'Underline'" class="ql-underline"></button>
-            </span>
-          </template>
-        </Editor> -->
-        <Message v-if="$form.codigo_base?.invalid" severity="error" size="small" variant="simple">{{ $form.codigo_base.error?.message }}</Message>
-      </div>
-      <div class="flex flex-col gap-1 p-4">
-        <div v-if="returnExec.out_put_from_user.success && returnExec.out_put_from_user.output !== ''" class="flex flex-col gap-1">
-          <label for="multiple-ac-1" class="font-bold mb-2 block">Saída da execução do código base</label>
-          <Textarea v-model="returnExec.out_put_from_user.output" rows="5" cols="40" />
-        </div>
-        <div v-if="!returnExec.out_put_from_user.success && returnExec.out_put_from_user.error !== ''" class="flex flex-col gap-1">
-          <label for="multiple-ac-1" class="font-bold mb-2 block">Erro da execução do código base</label>
-          <Textarea v-model="returnExec.out_put_from_user.error" rows="5" cols="40" />
-        </div>
-      </div>
-      <div class="flex flex-col gap-1">
-        <label for="multiple-ac-1" class="font-bold mb-2 block">Código Teste</label>
-        <MonacoEditor name="codigo_teste" v-model="valoresIniciais.codigo_teste" :options="optionsEditor" :lang="tipoDaLinguagem == 1 ? 'go' : 'python'" class="h-[600px]" />
-        <!-- <Editor name="codigo_teste" v-model="valoresIniciais.codigo_teste" editorStyle="height: 220px" spellcheck="false" ref="refQuillCodigoTeste">
-          <template v-slot:toolbar>
-            <span class="ql-formats">
-              <button v-tooltip.bottom="'Bold'" class="ql-bold"></button>
-              <button v-tooltip.bottom="'Italic'" class="ql-italic"></button>
-              <button v-tooltip.bottom="'Underline'" class="ql-underline"></button>
-            </span>
-          </template>
-        </Editor> -->
-        <Message v-if="$form.codigo_teste?.invalid" severity="error" size="small" variant="simple">{{ $form.codigo_teste.error?.message }}</Message>
-      </div>
-      <div class="flex flex-col gap-1 p-4">
-        <div v-if="returnExec.out_put_unit_teste.success && returnExec.out_put_unit_teste.output !== ''" class="flex flex-col gap-1">
-          <label for="multiple-ac-1" class="font-bold mb-2 block">Saída da execução do código teste</label>
-          <Textarea v-model="returnExec.out_put_unit_teste.output" rows="5" cols="40" />
-        </div>
-        <div v-if="!returnExec.out_put_unit_teste.success && returnExec.out_put_unit_teste.error !== ''" class="flex flex-col gap-1">
-          <label for="multiple-ac-1" class="font-bold mb-2 block">Erro da execução do código teste</label>
-          <Textarea v-model="returnExec.out_put_unit_teste.error" rows="5" cols="40" />
-        </div>
-      </div>
-      <div class="flex flex-col gap-1">
-          <label for="multiple-ac-1" class="font-bold mb-2 block">Feedback</label>
-          <div class="card">
-              <DataTable :value="feedbacks" tableStyle="min-width: 50rem">
-                  <Column field="descricao" header="Descrição">
-                      <template #body="{ data }">
-                          <div @click="editFeedback(data)" v-if="!data.isEditing">{{ data.descricao }}</div>
-                          <InputText v-else v-model="data.descricao" @blur="saveFeedback(data)" />
-                      </template>
-                  </Column>
-                  <Column class="w-24 !text-end">
-                      <template #body="{ data }">
-                          <Button @click="removerFeedback(data.id)" label="Apagar" severity="danger" outlined>Apagar</Button>
-                      </template>
-                  </Column>
-              </DataTable>
+
+      <!-- Código Base -->
+      <div class="rounded-2xl border border-white/10 overflow-hidden shadow-2xl bg-[#0d121f]">
+        <div class="flex items-center justify-between px-4 py-2.5 bg-[#0a0e17] border-b border-white/[0.08]">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-slate-600"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-slate-600"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-slate-600"></span>
           </div>
-          <div class="flex justify-center my-1">
-              <Button label="Adicionar feedbacks" @click="adicionarFeedback()"/>
-          </div>
-          <br/>
+          <span class="text-xs font-mono font-bold text-slate-300">Código Base do Aluno</span>
+          <span class="text-[11px] text-slate-500 font-mono">{{ tipoDaLinguagem === 1 ? 'Go' : 'Python' }}</span>
+        </div>
+        <MonacoEditor 
+          name="codigo_base" 
+          v-model="valoresIniciais.codigo_base" 
+          :options="optionsEditor" 
+          :lang="tipoDaLinguagem == 1 ? 'go' : 'python'" 
+          class="h-[460px] z-10" 
+        />
+        <Message v-if="$form.codigo_base?.invalid" severity="error" size="small" variant="simple" class="!text-xs !text-rose-400 p-3">
+          {{ $form.codigo_base.error?.message }}
+        </Message>
       </div>
-      <Button type="submit" severity="secondary" label="Adicionar" />
+
+      <!-- Retorno da Execução do Código Base -->
+      <div v-if="(returnExec.out_put_from_user.success && returnExec.out_put_from_user.output !== '') || (!returnExec.out_put_from_user.success && returnExec.out_put_from_user.error !== '')" class="mimo-card p-4 border border-white/10">
+        <label class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2 block">
+          {{ returnExec.out_put_from_user.success ? 'Saída da execução do código base:' : 'Erro da execução do código base:' }}
+        </label>
+        <Textarea 
+          :model-value="returnExec.out_put_from_user.success ? returnExec.out_put_from_user.output : returnExec.out_put_from_user.error" 
+          rows="4" 
+          readonly 
+          class="w-full !bg-slate-900/90 !font-mono !text-xs !border-white/10" 
+        />
+      </div>
+
+      <!-- Código de Teste -->
+      <div class="rounded-2xl border border-white/10 overflow-hidden shadow-2xl bg-[#0d121f]">
+        <div class="flex items-center justify-between px-4 py-2.5 bg-[#0a0e17] border-b border-white/[0.08]">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-slate-600"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-slate-600"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-slate-600"></span>
+          </div>
+          <span class="text-xs font-mono font-bold text-slate-300">Código da Suíte de Testes</span>
+          <span class="text-[11px] text-slate-500 font-mono">{{ tipoDaLinguagem === 1 ? 'Go Test' : 'PyTest' }}</span>
+        </div>
+        <MonacoEditor 
+          name="codigo_teste" 
+          v-model="valoresIniciais.codigo_teste" 
+          :options="optionsEditor" 
+          :lang="tipoDaLinguagem == 1 ? 'go' : 'python'" 
+          class="h-[460px]" 
+        />
+        <Message v-if="$form.codigo_teste?.invalid" severity="error" size="small" variant="simple" class="!text-xs !text-rose-400 p-3">
+          {{ $form.codigo_teste.error?.message }}
+        </Message>
+      </div>
+
+      <!-- Retorno da Execução do Código Teste -->
+      <div v-if="(returnExec.out_put_unit_teste.success && returnExec.out_put_unit_teste.output !== '') || (!returnExec.out_put_unit_teste.success && returnExec.out_put_unit_teste.error !== '')" class="mimo-card p-4 border border-white/10">
+        <label class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2 block">
+          {{ returnExec.out_put_unit_teste.success ? 'Saída dos testes unitários:' : 'Erro dos testes unitários:' }}
+        </label>
+        <Textarea 
+          :model-value="returnExec.out_put_unit_teste.success ? returnExec.out_put_unit_teste.output : returnExec.out_put_unit_teste.error" 
+          rows="4" 
+          readonly 
+          class="w-full !bg-slate-900/90 !font-mono !text-xs !border-white/10" 
+        />
+      </div>
+
+      <!-- Feedbacks Automatizados -->
+      <div class="mimo-card p-6 border border-white/10 shadow-xl space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-white/[0.08]">
+          <label class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+            <i class="pi pi-comments text-indigo-400"></i>
+            <span>Dicas e Feedbacks Pré-Cadastrados</span>
+          </label>
+          <button 
+            type="button" 
+            @click="adicionarFeedback()" 
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 transition"
+          >
+            <i class="pi pi-plus text-[10px]"></i>
+            <span>Nova Dica</span>
+          </button>
+        </div>
+
+        <DataTable :value="feedbacks" class="w-full">
+          <Column field="descricao" header="Descrição do Feedback">
+            <template #body="{ data }">
+              <div @click="editFeedback(data)" v-if="!data.isEditing" class="cursor-pointer text-sm text-slate-200 hover:text-indigo-300">
+                {{ data.descricao || '(Clique para editar a dica)' }}
+              </div>
+              <InputText v-else v-model="data.descricao" @blur="saveFeedback(data)" class="!p-2 text-sm w-full" />
+            </template>
+          </Column>
+          <Column style="width: 5rem; text-align: right;">
+            <template #body="{ data }">
+              <button 
+                type="button" 
+                @click="removerFeedback(data.id)" 
+                class="p-1.5 rounded-lg text-rose-400 hover:bg-rose-500/10 transition"
+                title="Remover dica"
+              >
+                <i class="pi pi-trash text-xs"></i>
+              </button>
+            </template>
+          </Column>
+        </DataTable>
+      </div>
+
+      <!-- Submit Action -->
+      <div class="flex justify-end pt-2">
+        <button 
+          type="submit" 
+          class="mimo-btn-primary px-8 py-3 text-sm font-bold flex items-center gap-2"
+        >
+          <i class="pi pi-check text-xs"></i>
+          <span>Cadastrar Exercício</span>
+        </button>
+      </div>
     </Form>
   </div>
 </template>

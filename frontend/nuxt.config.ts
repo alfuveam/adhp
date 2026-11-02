@@ -27,12 +27,18 @@ export default defineNuxtConfig({
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
         { rel: 'icon', type: 'image/png', href: '/favicon.png' },
         { rel: 'apple-touch-icon', href: '/favicon.png' },
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap' },
       ],
     },
   },
 
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
+  css: [
+    'primeicons/primeicons.css',
+  ],
   modules: [
     '@nuxtjs/tailwindcss',
     '@primevue/nuxt-module',
