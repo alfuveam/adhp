@@ -2,89 +2,96 @@
   <div class="min-h-[calc(100vh-8rem)] flex items-center justify-center p-4 sm:p-6">
     <Toast />
 
-    <!-- Login Card (Mimo Style) -->
-    <div class="w-full max-w-md mimo-card p-8 border-[#2c335a] bg-[#161a33] shadow-2xl space-y-6">
-      
-      <!-- Card Header -->
+    <div class="w-full max-w-md study-card p-8 border-[#dce1d9] bg-[#ffffff] shadow-none space-y-6">
       <div class="space-y-2 text-center">
-        <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-purple-500/20 border border-purple-500/30 text-purple-300 mb-1">
+        <div
+          class="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-sky-900/5 border border-slate-200 text-sky-800 mb-1"
+        >
           <i class="pi pi-lock text-lg"></i>
         </div>
-        <h1 class="text-2xl font-extrabold text-white tracking-tight">
-          Acessar Plataforma
-        </h1>
-        <p class="text-xs text-slate-300">
-          Ambiente integrado para discentes e docentes da UNESC
-        </p>
+        <h1 class="text-2xl font-semibold text-slate-800 tracking-tight">Bom ter você por aqui.</h1>
+        <p class="text-sm text-slate-600">Entre na sua conta para continuar seus estudos.</p>
       </div>
 
-      <!-- Form -->
-      <Form 
-        v-slot="$form" 
-        :initialValues="initialValues" 
-        :resolver="resolver" 
-        @submit="onFormSubmit" 
+      <Form
+        v-slot="$form"
+        :initialValues="initialValues"
+        :resolver="resolver"
+        @submit="onFormSubmit"
         class="flex flex-col gap-4"
       >
-        <!-- Email field -->
         <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-bold text-slate-300">Email Acadêmico ou Pessoal</label>
-          <InputText 
-            v-model="initialValues.email" 
-            name="email" 
-            type="email" 
-            placeholder="seu.email@exemplo.com" 
-            class="w-full !p-3 !bg-[#0f1122] !border-[#2a3154] focus:!border-[#7c4ed4] rounded-xl text-sm"
-            fluid 
+          <label class="text-sm font-semibold text-slate-600">E-mail</label>
+          <InputText
+            v-model="initialValues.email"
+            name="email"
+            type="email"
+            placeholder="seu.email@exemplo.com"
+            class="w-full !p-3 !bg-[#ffffff] !border-[#dce1d9] focus:!border-[#285b75] rounded-lg text-sm"
+            fluid
           />
-          <Message v-if="$form.email?.invalid" severity="error" size="small" variant="simple" class="!text-xs !text-rose-400 mt-1">
+          <Message
+            v-if="$form.email?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            class="!text-sm !text-rose-700 mt-1"
+          >
             {{ $form.email.error.message }}
           </Message>
         </div>
 
-        <!-- Password field -->
         <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-bold text-slate-300">Senha</label>
-          <Password 
-            v-model="initialValues.password" 
-            name="password" 
-            placeholder="Sua senha" 
-            :feedback="false" 
-            toggleMask 
+          <label class="text-sm font-semibold text-slate-600">Senha</label>
+          <Password
+            v-model="initialValues.password"
+            name="password"
+            placeholder="Sua senha"
+            :feedback="false"
+            toggleMask
             class="w-full"
-            inputClass="w-full !p-3 !bg-[#0f1122] !border-[#2a3154] focus:!border-[#7c4ed4] rounded-xl text-sm"
-            fluid 
+            inputClass="w-full !p-3 !bg-[#ffffff] !border-[#dce1d9] focus:!border-[#285b75] rounded-lg text-sm"
+            fluid
           />
-          <Message v-if="$form.password?.invalid" severity="error" size="small" variant="simple" class="!text-xs !text-rose-400 mt-1">
+          <Message
+            v-if="$form.password?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            class="!text-sm !text-rose-700 mt-1"
+          >
             <ul class="my-0 px-2 flex flex-col gap-0.5">
-              <li v-for="(error, index) of $form.password.errors" :key="index">{{ error.message }}</li>
+              <li v-for="(error, index) of $form.password.errors" :key="index">
+                {{ error.message }}
+              </li>
             </ul>
           </Message>
         </div>
 
-        <!-- Submit Button -->
-        <button 
-          type="submit" 
-          class="mimo-btn-primary w-full mt-2 py-3 rounded-xl text-sm font-bold"
+        <button
+          type="submit"
+          class="study-btn-primary w-full mt-2 py-3 rounded-lg text-sm font-semibold"
         >
           <span>Entrar na Conta</span>
-          <i class="pi pi-arrow-right text-xs"></i>
+          <i class="pi pi-arrow-right text-sm"></i>
         </button>
       </Form>
 
-      <!-- Bottom Switch to Register -->
-      <div class="pt-4 border-t border-[#252b4c] text-center">
-        <p class="text-xs text-slate-300">
-          Ainda não tem conta de aluno?
-          <NuxtLink to="/account/createaccount" class="font-bold text-purple-300 hover:text-purple-200 ml-1">
+      <div class="pt-4 border-t border-[#dce1d9] text-center">
+        <p class="text-sm text-slate-600">
+          Está começando agora?
+          <NuxtLink
+            to="/account/createaccount"
+            class="font-semibold text-sky-800 hover:text-sky-900 ml-1"
+          >
             Cadastre-se aqui
           </NuxtLink>
         </p>
       </div>
-
     </div>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import { ref } from 'vue';

@@ -2,169 +2,211 @@
   <div class="min-h-[calc(100vh-8rem)] flex items-center justify-center p-4 sm:p-6">
     <Toast />
 
-    <!-- Register Card (Mimo Style) -->
-    <div class="w-full max-w-lg mimo-card p-8 border-[#2c335a] bg-[#161a33] shadow-2xl space-y-6">
-      
-      <!-- Card Header -->
+    <div class="w-full max-w-lg study-card p-8 border-[#dce1d9] bg-[#ffffff] shadow-none space-y-6">
       <div class="space-y-2 text-center">
-        <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-purple-500/20 border border-purple-500/30 text-purple-300 mb-1">
+        <div
+          class="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-sky-900/5 border border-slate-200 text-sky-800 mb-1"
+        >
           <i class="pi pi-user-plus text-lg"></i>
         </div>
-        <h1 class="text-2xl font-extrabold text-white tracking-tight">
-          Criar Conta de Aluno
-        </h1>
-        <p class="text-xs text-slate-300">
+        <h1 class="text-2xl font-semibold text-slate-800 tracking-tight">Criar Conta de Aluno</h1>
+        <p class="text-sm text-slate-600">
           Acesse os desafios práticos das trilhas e acompanhe sua curva de retenção
         </p>
       </div>
 
-      <!-- Form -->
-      <Form 
-        v-slot="$form" 
-        :initialValues="initialValues" 
-        :resolver="resolver" 
-        @submit="onFormSubmit" 
+      <Form
+        v-slot="$form"
+        :initialValues="initialValues"
+        :resolver="resolver"
+        @submit="onFormSubmit"
         class="flex flex-col gap-4"
       >
-        <!-- Nome Completo -->
         <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-bold text-slate-300">Nome Completo</label>
-          <InputText 
-            v-model="initialValues.completename" 
-            name="completename" 
-            type="text" 
-            placeholder="Nome e Sobrenome" 
-            class="w-full !p-3 !bg-[#0f1122] !border-[#2a3154] focus:!border-[#7c4ed4] rounded-xl text-sm"
-            fluid 
+          <label class="text-sm font-semibold text-slate-600">Nome Completo</label>
+          <InputText
+            v-model="initialValues.completename"
+            name="completename"
+            type="text"
+            placeholder="Nome e Sobrenome"
+            class="w-full !p-3 !bg-[#ffffff] !border-[#dce1d9] focus:!border-[#285b75] rounded-lg text-sm"
+            fluid
           />
-          <Message v-if="$form.completename?.invalid" severity="error" size="small" variant="simple" class="!text-xs !text-rose-400 mt-1">
+          <Message
+            v-if="$form.completename?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            class="!text-sm !text-rose-700 mt-1"
+          >
             {{ $form.completename.error.message }}
           </Message>
         </div>
 
-        <!-- Email -->
         <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-bold text-slate-300">Email Acadêmico ou Pessoal</label>
-          <InputText 
-            v-model="initialValues.email" 
-            name="email" 
-            type="email" 
-            placeholder="aluno@universidade.edu.br" 
-            class="w-full !p-3 !bg-[#0f1122] !border-[#2a3154] focus:!border-[#7c4ed4] rounded-xl text-sm"
-            fluid 
+          <label class="text-sm font-semibold text-slate-600">Email Acadêmico ou Pessoal</label>
+          <InputText
+            v-model="initialValues.email"
+            name="email"
+            type="email"
+            placeholder="aluno@universidade.edu.br"
+            class="w-full !p-3 !bg-[#ffffff] !border-[#dce1d9] focus:!border-[#285b75] rounded-lg text-sm"
+            fluid
           />
-          <Message v-if="$form.email?.invalid" severity="error" size="small" variant="simple" class="!text-xs !text-rose-400 mt-1">
+          <Message
+            v-if="$form.email?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            class="!text-sm !text-rose-700 mt-1"
+          >
             {{ $form.email.error.message }}
           </Message>
         </div>
 
-        <!-- Repetição Espaçada (Tactile Pill Selector) -->
         <div class="flex flex-col gap-2">
           <div class="flex items-center justify-between">
-            <label class="text-xs font-bold text-slate-300">Intervalo de Repetição Espaçada</label>
-            <span class="text-[11px] text-purple-300 font-semibold font-mono">Curva Ebbinghaus</span>
+            <label class="text-sm font-semibold text-slate-600"
+              >Intervalo de Repetição Espaçada</label
+            >
+            <span class="text-[11px] text-sky-800 font-semibold font-mono">Curva Ebbinghaus</span>
           </div>
 
-          <RadioButtonGroup name="repeticao_espacada_minutos" v-model="initialValues.repeticao_espacada_minutos" class="grid grid-cols-5 gap-2">
-            <div 
-              @click="initialValues.repeticao_espacada_minutos = '1'" 
-              class="flex flex-col items-center justify-center p-2.5 rounded-xl border cursor-pointer transition text-center"
-              :class="initialValues.repeticao_espacada_minutos === '1' ? 'bg-[#7c4ed4] border-[#9061ea] text-white font-bold border-b-2 border-b-[#5326ab]' : 'bg-[#0f1122] border-[#2a3154] hover:border-[#4d568c] text-slate-300'"
+          <RadioButtonGroup
+            name="repeticao_espacada_minutos"
+            v-model="initialValues.repeticao_espacada_minutos"
+            class="grid grid-cols-5 gap-2"
+          >
+            <div
+              @click="initialValues.repeticao_espacada_minutos = '1'"
+              class="flex flex-col items-center justify-center p-2.5 rounded-lg border cursor-pointer transition text-center"
+              :class="
+                initialValues.repeticao_espacada_minutos === '1'
+                  ? 'bg-[#285b75] border-[#285b75] text-white font-semibold border-b-2 border-b-[#204c63]'
+                  : 'bg-[#ffffff] border-[#dce1d9] hover:border-[#dce1d9] text-slate-600'
+              "
             >
               <RadioButton inputId="rep-1" value="1" class="hidden" />
-              <span class="text-xs font-bold">1 Hora</span>
+              <span class="text-sm font-semibold">1 Hora</span>
               <span class="text-[10px] opacity-75">Curto</span>
             </div>
 
-            <div 
-              @click="initialValues.repeticao_espacada_minutos = '2'" 
-              class="flex flex-col items-center justify-center p-2.5 rounded-xl border cursor-pointer transition text-center"
-              :class="initialValues.repeticao_espacada_minutos === '2' ? 'bg-[#7c4ed4] border-[#9061ea] text-white font-bold border-b-2 border-b-[#5326ab]' : 'bg-[#0f1122] border-[#2a3154] hover:border-[#4d568c] text-slate-300'"
+            <div
+              @click="initialValues.repeticao_espacada_minutos = '2'"
+              class="flex flex-col items-center justify-center p-2.5 rounded-lg border cursor-pointer transition text-center"
+              :class="
+                initialValues.repeticao_espacada_minutos === '2'
+                  ? 'bg-[#285b75] border-[#285b75] text-white font-semibold border-b-2 border-b-[#204c63]'
+                  : 'bg-[#ffffff] border-[#dce1d9] hover:border-[#dce1d9] text-slate-600'
+              "
             >
               <RadioButton inputId="rep-2" value="2" class="hidden" />
-              <span class="text-xs font-bold">9 Horas</span>
+              <span class="text-sm font-semibold">9 Horas</span>
               <span class="text-[10px] opacity-75">Mesmo dia</span>
             </div>
 
-            <div 
-              @click="initialValues.repeticao_espacada_minutos = '3'" 
-              class="flex flex-col items-center justify-center p-2.5 rounded-xl border cursor-pointer transition text-center"
-              :class="initialValues.repeticao_espacada_minutos === '3' ? 'bg-[#7c4ed4] border-[#9061ea] text-white font-bold border-b-2 border-b-[#5326ab]' : 'bg-[#0f1122] border-[#2a3154] hover:border-[#4d568c] text-slate-300'"
+            <div
+              @click="initialValues.repeticao_espacada_minutos = '3'"
+              class="flex flex-col items-center justify-center p-2.5 rounded-lg border cursor-pointer transition text-center"
+              :class="
+                initialValues.repeticao_espacada_minutos === '3'
+                  ? 'bg-[#285b75] border-[#285b75] text-white font-semibold border-b-2 border-b-[#204c63]'
+                  : 'bg-[#ffffff] border-[#dce1d9] hover:border-[#dce1d9] text-slate-600'
+              "
             >
               <RadioButton inputId="rep-3" value="3" class="hidden" />
-              <span class="text-xs font-bold">1 Dia</span>
+              <span class="text-sm font-semibold">1 Dia</span>
               <span class="text-[10px] opacity-75">Padrão</span>
             </div>
 
-            <div 
-              @click="initialValues.repeticao_espacada_minutos = '4'" 
-              class="flex flex-col items-center justify-center p-2.5 rounded-xl border cursor-pointer transition text-center"
-              :class="initialValues.repeticao_espacada_minutos === '4' ? 'bg-[#7c4ed4] border-[#9061ea] text-white font-bold border-b-2 border-b-[#5326ab]' : 'bg-[#0f1122] border-[#2a3154] hover:border-[#4d568c] text-slate-300'"
+            <div
+              @click="initialValues.repeticao_espacada_minutos = '4'"
+              class="flex flex-col items-center justify-center p-2.5 rounded-lg border cursor-pointer transition text-center"
+              :class="
+                initialValues.repeticao_espacada_minutos === '4'
+                  ? 'bg-[#285b75] border-[#285b75] text-white font-semibold border-b-2 border-b-[#204c63]'
+                  : 'bg-[#ffffff] border-[#dce1d9] hover:border-[#dce1d9] text-slate-600'
+              "
             >
               <RadioButton inputId="rep-4" value="4" class="hidden" />
-              <span class="text-xs font-bold">6 Dias</span>
+              <span class="text-sm font-semibold">6 Dias</span>
               <span class="text-[10px] opacity-75">Semanal</span>
             </div>
 
-            <div 
-              @click="initialValues.repeticao_espacada_minutos = '5'" 
-              class="flex flex-col items-center justify-center p-2.5 rounded-xl border cursor-pointer transition text-center"
-              :class="initialValues.repeticao_espacada_minutos === '5' ? 'bg-[#7c4ed4] border-[#9061ea] text-white font-bold border-b-2 border-b-[#5326ab]' : 'bg-[#0f1122] border-[#2a3154] hover:border-[#4d568c] text-slate-300'"
+            <div
+              @click="initialValues.repeticao_espacada_minutos = '5'"
+              class="flex flex-col items-center justify-center p-2.5 rounded-lg border cursor-pointer transition text-center"
+              :class="
+                initialValues.repeticao_espacada_minutos === '5'
+                  ? 'bg-[#285b75] border-[#285b75] text-white font-semibold border-b-2 border-b-[#204c63]'
+                  : 'bg-[#ffffff] border-[#dce1d9] hover:border-[#dce1d9] text-slate-600'
+              "
             >
               <RadioButton inputId="rep-5" value="5" class="hidden" />
-              <span class="text-xs font-bold">31 Dias</span>
+              <span class="text-sm font-semibold">31 Dias</span>
               <span class="text-[10px] opacity-75">Mensal</span>
             </div>
           </RadioButtonGroup>
 
-          <Message v-if="$form.repeticao_espacada_minutos?.invalid" severity="error" size="small" variant="simple" class="!text-xs !text-rose-400 mt-1">
+          <Message
+            v-if="$form.repeticao_espacada_minutos?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            class="!text-sm !text-rose-700 mt-1"
+          >
             {{ $form.repeticao_espacada_minutos.error?.message }}
           </Message>
         </div>
 
-        <!-- Senha -->
         <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-bold text-slate-300">Senha (mínimo 9 caracteres)</label>
-          <Password 
-            v-model="initialValues.password" 
-            name="password" 
-            placeholder="Digite uma senha forte" 
-            :feedback="false" 
-            toggleMask 
+          <label class="text-sm font-semibold text-slate-600">Senha (mínimo 9 caracteres)</label>
+          <Password
+            v-model="initialValues.password"
+            name="password"
+            placeholder="Digite uma senha forte"
+            :feedback="false"
+            toggleMask
             class="w-full"
-            inputClass="w-full !p-3 !bg-[#0f1122] !border-[#2a3154] focus:!border-[#7c4ed4] rounded-xl text-sm"
-            fluid 
+            inputClass="w-full !p-3 !bg-[#ffffff] !border-[#dce1d9] focus:!border-[#285b75] rounded-lg text-sm"
+            fluid
           />
-          <Message v-if="$form.password?.invalid" severity="error" size="small" variant="simple" class="!text-xs !text-rose-400 mt-1">
+          <Message
+            v-if="$form.password?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            class="!text-sm !text-rose-700 mt-1"
+          >
             <ul class="my-0 px-2 flex flex-col gap-0.5">
-              <li v-for="(error, index) of $form.password.errors" :key="index">{{ error.message }}</li>
+              <li v-for="(error, index) of $form.password.errors" :key="index">
+                {{ error.message }}
+              </li>
             </ul>
           </Message>
         </div>
 
-        <!-- Submit Button -->
-        <button 
-          type="submit" 
-          class="mimo-btn-primary w-full mt-2 py-3 rounded-xl text-sm font-bold"
+        <button
+          type="submit"
+          class="study-btn-primary w-full mt-2 py-3 rounded-lg text-sm font-semibold"
         >
           <span>Criar Minha Conta</span>
-          <i class="pi pi-arrow-right text-xs"></i>
+          <i class="pi pi-arrow-right text-sm"></i>
         </button>
       </Form>
 
-      <!-- Bottom Link -->
-      <div class="pt-4 border-t border-[#2e3458] text-center">
-        <p class="text-xs text-slate-300">
+      <div class="pt-4 border-t border-[#dce1d9] text-center">
+        <p class="text-sm text-slate-600">
           Já tem conta cadastrada?
-          <NuxtLink to="/account/login" class="font-bold text-purple-300 hover:text-purple-200 ml-1">
+          <NuxtLink to="/account/login" class="font-semibold text-sky-800 hover:text-sky-900 ml-1">
             Faça login aqui
           </NuxtLink>
         </p>
       </div>
-
     </div>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import { ref } from 'vue';

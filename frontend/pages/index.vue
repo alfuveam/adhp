@@ -1,633 +1,132 @@
 <template>
-  <div class="space-y-20 lg:space-y-28 py-6 sm:py-10">
-    
-    <!-- ========================================== -->
-    <!-- HERO SECTION (Rich Interactive EdTech)    -->
-    <!-- ========================================== -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-        
-        <!-- Left Hero Content -->
-        <div class="lg:col-span-6 space-y-6 text-center lg:text-left">
-          
-          <!-- Academic Origin Badge -->
-          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1c203b] text-purple-300 text-xs font-bold border border-[#323963]">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>UNESC • Ciência da Computação</span>
-          </div>
-
-          <!-- Main Value Headline -->
-          <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-[1.15]">
-            Aprenda lógica de programação com <span class="text-[#c084fc]">testes automáticos</span> e repetição espaçada.
-          </h1>
-
-          <!-- Concise, Human Subhead -->
-          <p class="text-base sm:text-lg text-slate-300 max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
-            Escreva código em Python e Go, receba validação instantânea no sandbox de testes e fixe o aprendizado de longo prazo com o método científico da curva de Ebbinghaus.
-          </p>
-
-          <!-- Primary Actions (Tactile Mimo 3D Buttons) -->
-          <div class="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-            <template v-if="!isAuthenticated">
-              <NuxtLink 
-                to="/account/createaccount" 
-                class="w-full sm:w-auto mimo-btn-primary px-7 py-3.5 text-base"
-              >
-                <span>Começar Gratuitamente</span>
-                <i class="pi pi-arrow-right text-xs"></i>
-              </NuxtLink>
-
-              <NuxtLink 
-                to="/account/login" 
-                class="w-full sm:w-auto mimo-btn-secondary px-6 py-3.5 text-base"
-              >
-                <span>Acessar Conta</span>
-              </NuxtLink>
-            </template>
-
-            <template v-else>
-              <button 
-                @click="redirectToDashboard" 
-                class="w-full sm:w-auto mimo-btn-primary px-7 py-3.5 text-base"
-              >
-                <i class="pi pi-th-large text-sm"></i>
-                <span>Acessar Meu Painel</span>
-              </button>
-            </template>
-          </div>
-
-          <!-- Proof / Feature Highlights -->
-          <div class="pt-3 flex flex-wrap items-center justify-center lg:justify-start gap-3 text-xs font-semibold text-slate-300">
-            <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#171a30] border border-[#2b3258]">
-              <i class="pi pi-bolt text-emerald-400 text-sm"></i>
-              <span>Testes no Sandbox em &lt; 50ms</span>
-            </div>
-            <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#171a30] border border-[#2b3258]">
-              <i class="pi pi-history text-purple-400 text-sm"></i>
-              <span>Curva de Retenção Ebbinghaus</span>
-            </div>
-            <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#171a30] border border-[#2b3258]">
-              <i class="pi pi-code text-cyan-400 text-sm"></i>
-              <span>Ambientes Go &amp; Python</span>
-            </div>
-          </div>
-
+  <div class="home-page">
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Para quem está começando</div>
+        <h1>Seu primeiro programa começa com <em>uma tentativa.</em></h1>
+        <p class="intro">
+          Aprenda lógica de programação colocando suas ideias em prática. Resolva exercícios em
+          Python e Go, confira o resultado e tente de novo quando precisar.
+        </p>
+        <div class="actions">
+          <NuxtLink v-if="!isAuthenticated" class="button" to="/account/createaccount"
+            >Começar a praticar
+            <span aria-hidden="true" style="margin-left: 15px">→</span></NuxtLink
+          ><button v-else class="button" @click="redirectToDashboard">Ir para meus estudos →</button
+          ><a class="textlink" href="#metodologia">Entenda como funciona</a>
         </div>
-
-        <!-- Right Hero Mockup: Interactive Code & Test Workstation -->
-        <div class="lg:col-span-6">
-          <div class="mimo-card p-0 overflow-hidden shadow-2xl border-[#323963] bg-[#121424]">
-            
-            <!-- Window Titlebar with Language Switcher -->
-            <div class="flex items-center justify-between px-4 py-3 bg-[#191d36] border-b border-[#282f54]">
-              <!-- Window Control Dots -->
-              <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full bg-rose-500/80"></span>
-                <span class="w-3 h-3 rounded-full bg-amber-500/80"></span>
-                <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
-              </div>
-
-              <!-- Interactive Language Tabs -->
-              <div class="flex items-center p-0.5 rounded-lg bg-[#111322] border border-[#272d50]">
-                <button 
-                  id="tab-btn-python"
-                  type="button"
-                  @click="activeCodeTab = 'python'"
-                  class="px-3 py-1 rounded-md text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
-                  :class="activeCodeTab === 'python' ? 'bg-[#7c4ed4] text-white shadow-sm' : 'text-slate-400 hover:text-white'"
-                >
-                  <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-                  <span>Python</span>
-                </button>
-                <button 
-                  id="tab-btn-golang"
-                  type="button"
-                  @click="activeCodeTab = 'golang'"
-                  class="px-3 py-1 rounded-md text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
-                  :class="activeCodeTab === 'golang' ? 'bg-[#0284c7] text-white shadow-sm' : 'text-slate-400 hover:text-white'"
-                >
-                  <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
-                  <span>Golang</span>
-                </button>
-              </div>
-
-              <!-- Status Tag -->
-              <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
-                <i class="pi pi-check text-[9px]"></i>
-                <span>{{ activeCodeTab === 'python' ? 'Python 3.12' : 'Go 1.22' }}</span>
-              </span>
+        <p class="note">Não precisa acertar de primeira. Faz parte do aprendizado.</p>
+      </div>
+      <div>
+        <div class="example">
+          <div class="example-label">Uma primeira experiência <span>Python</span></div>
+          <div class="exercise">
+            <h3>Vamos dizer olá?</h3>
+            <p>Este programa mostra uma mensagem com seu nome.</p>
+          </div>
+          <div class="code">
+            <span class="line">1</span>nome = <span class="str">"Ana"</span><br /><span class="line"
+              >2</span
+            ><span class="func">print</span>(<span class="str">"Olá, "</span> + nome)
+          </div>
+          <div class="run">
+            <span>2 linhas. Um começo.</span
+            ><button class="button" type="button" @click="exampleExecuted = true">
+              {{ exampleExecuted ? "Ver resultado novamente ↻" : "Ver resultado ▷" }}
+            </button>
+          </div>
+          <div class="output" v-if="exampleExecuted" id="result" role="status">
+            <small>Saída do programa</small><code>Olá, Ana</code>
+            <div style="margin-top: 8px; color: #67795c; font-size: 12px">
+              O programa juntou a saudação com o nome escolhido.
             </div>
-
-            <!-- Code Editor Body (Python Tab) -->
-            <div v-if="activeCodeTab === 'python'" class="p-5 font-mono text-xs leading-relaxed space-y-1 bg-[#0f111f] text-slate-200">
-              <div class="text-slate-500 text-[11px] pb-1"># Desafio: Soma de Elementos Pares (Lista 01)</div>
-              <div class="flex items-start gap-3">
-                <span class="text-slate-600 select-none w-4 text-right">1</span>
-                <div><span class="text-purple-400 font-semibold">def</span> <span class="text-yellow-300 font-semibold">soma_pares</span>(valores: list[int]) -> int:</div>
-              </div>
-              <div class="flex items-start gap-3">
-                <span class="text-slate-600 select-none w-4 text-right">2</span>
-                <div class="pl-4">total = <span class="text-amber-300">0</span></div>
-              </div>
-              <div class="flex items-start gap-3">
-                <span class="text-slate-600 select-none w-4 text-right">3</span>
-                <div class="pl-4"><span class="text-purple-400 font-semibold">for</span> num <span class="text-purple-400 font-semibold">in</span> valores:</div>
-              </div>
-              <div class="flex items-start gap-3">
-                <span class="text-slate-600 select-none w-4 text-right">4</span>
-                <div class="pl-8"><span class="text-purple-400 font-semibold">if</span> num % <span class="text-amber-300">2</span> == <span class="text-amber-300">0</span>:</div>
-              </div>
-              <div class="flex items-start gap-3">
-                <span class="text-slate-600 select-none w-4 text-right">5</span>
-                <div class="pl-12">total += num</div>
-              </div>
-              <div class="flex items-start gap-3">
-                <span class="text-slate-600 select-none w-4 text-right">6</span>
-                <div class="pl-4"><span class="text-purple-400 font-semibold">return</span> total</div>
-              </div>
-            </div>
-
-            <!-- Code Editor Body (Golang Tab) -->
-            <div v-else class="p-5 font-mono text-xs leading-relaxed space-y-1 bg-[#0f111f] text-slate-200">
-              <div class="text-slate-500 text-[11px] pb-1">// Desafio: Soma de Elementos Pares (Lista 01)</div>
-              <div class="flex items-start gap-3">
-                <span class="text-slate-600 select-none w-4 text-right">1</span>
-                <div><span class="text-cyan-400 font-semibold">package</span> main</div>
-              </div>
-              <div class="flex items-start gap-3">
-                <span class="text-slate-600 select-none w-4 text-right">2</span>
-                <div><span class="text-cyan-400 font-semibold">func</span> <span class="text-yellow-300 font-semibold">SomaPares</span>(valores []<span class="text-cyan-300">int</span>) <span class="text-cyan-300">int</span> {</div>
-              </div>
-              <div class="flex items-start gap-3">
-                <span class="text-slate-600 select-none w-4 text-right">3</span>
-                <div class="pl-4">total := <span class="text-amber-300">0</span></div>
-              </div>
-              <div class="flex items-start gap-3">
-                <span class="text-slate-600 select-none w-4 text-right">4</span>
-                <div class="pl-4"><span class="text-purple-400 font-semibold">for</span> _, num := <span class="text-purple-400 font-semibold">range</span> valores {</div>
-              </div>
-              <div class="flex items-start gap-3">
-                <span class="text-slate-600 select-none w-4 text-right">5</span>
-                <div class="pl-8"><span class="text-purple-400 font-semibold">if</span> num%<span class="text-amber-300">2</span> == <span class="text-amber-300">0</span> { total += num }</div>
-              </div>
-              <div class="flex items-start gap-3">
-                <span class="text-slate-600 select-none w-4 text-right">6</span>
-                <div class="pl-4">}</div>
-              </div>
-              <div class="flex items-start gap-3">
-                <span class="text-slate-600 select-none w-4 text-right">7</span>
-                <div class="pl-4"><span class="text-purple-400 font-semibold">return</span> total</div>
-              </div>
-              <div class="flex items-start gap-3">
-                <span class="text-slate-600 select-none w-4 text-right">8</span>
-                <div>}</div>
-              </div>
-            </div>
-
-            <!-- Test Results & Spaced Repetition Panel -->
-            <div class="border-t border-[#262c4e] bg-[#15182e] p-5 space-y-4">
-              
-              <!-- Result Header -->
-              <div class="flex items-center justify-between pb-2 border-b border-[#24294a]">
-                <div class="flex items-center gap-2">
-                  <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs">
-                    <i class="pi pi-check"></i>
-                  </span>
-                  <span class="text-xs sm:text-sm font-bold text-white">3 de 3 Testes Unitários Aprovados</span>
-                </div>
-                <span class="text-[11px] font-mono text-slate-400">Sandbox: {{ activeCodeTab === 'python' ? '0.038s' : '0.019s' }}</span>
-              </div>
-
-              <!-- Test Chips -->
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] font-mono">
-                <div class="p-2 rounded-xl bg-[#0f1120] border border-[#252b4c] flex items-center justify-between">
-                  <span class="text-slate-300">{{ activeCodeTab === 'python' ? 'test_pares' : 'TestSomaPares' }}</span>
-                  <span class="text-emerald-400 font-bold flex items-center gap-1">
-                    <i class="pi pi-check text-[10px]"></i> OK
-                  </span>
-                </div>
-                <div class="p-2 rounded-xl bg-[#0f1120] border border-[#252b4c] flex items-center justify-between">
-                  <span class="text-slate-300">{{ activeCodeTab === 'python' ? 'test_misto' : 'TestMistos' }}</span>
-                  <span class="text-emerald-400 font-bold flex items-center gap-1">
-                    <i class="pi pi-check text-[10px]"></i> OK
-                  </span>
-                </div>
-                <div class="p-2 rounded-xl bg-[#0f1120] border border-[#252b4c] flex items-center justify-between">
-                  <span class="text-slate-300">{{ activeCodeTab === 'python' ? 'test_vazia' : 'TestSliceVazio' }}</span>
-                  <span class="text-emerald-400 font-bold flex items-center gap-1">
-                    <i class="pi pi-check text-[10px]"></i> OK
-                  </span>
-                </div>
-              </div>
-
-              <!-- Visual Ebbinghaus Timeline (Spaced Repetition Progression) -->
-              <div class="p-3.5 rounded-2xl bg-[#1b203c] border border-[#323963] space-y-2.5">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-2">
-                    <i class="pi pi-calendar-plus text-purple-400 text-xs"></i>
-                    <span class="text-xs font-bold text-white">Curva de Repetição Espaçada</span>
-                  </div>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                    Retenção Estimada: 94%
-                  </span>
-                </div>
-
-                <!-- 5 Steps of Hermann Ebbinghaus -->
-                <div class="grid grid-cols-5 gap-1.5 pt-1 text-center font-mono">
-                  <div class="p-1.5 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[10px] font-bold">
-                    <div>1h</div>
-                    <div class="text-[9px] opacity-80">Feito ✓</div>
-                  </div>
-                  <div class="p-1.5 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[10px] font-bold">
-                    <div>9h</div>
-                    <div class="text-[9px] opacity-80">Feito ✓</div>
-                  </div>
-                  <div class="p-1.5 rounded-lg bg-purple-600 text-white font-bold text-[10px] shadow-sm animate-pulse">
-                    <div>1d</div>
-                    <div class="text-[9px]">Hoje ⏳</div>
-                  </div>
-                  <div class="p-1.5 rounded-lg bg-[#111322] border border-[#272d50] text-slate-500 text-[10px]">
-                    <div>6d</div>
-                    <div class="text-[9px]">Fila</div>
-                  </div>
-                  <div class="p-1.5 rounded-lg bg-[#111322] border border-[#272d50] text-slate-500 text-[10px]">
-                    <div>31d</div>
-                    <div class="text-[9px]">Fila</div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
           </div>
         </div>
-
+        <div class="caption">Pequenos exercícios para entender uma ideia de cada vez.</div>
       </div>
     </section>
-
-    <!-- ========================================== -->
-    <!-- SECTION 2: COMO FUNCIONA (VISUAL WORKFLOW) -->
-    <!-- ========================================== -->
-    <section id="metodologia" class="py-14 bg-[#14172c]/70 border-y border-[#262c4e]">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        
-        <div class="max-w-2xl space-y-2 text-center sm:text-left">
-          <span class="mimo-badge mimo-badge-purple uppercase tracking-wider text-xs font-bold">
-            Metodologia Ativa
-          </span>
-          <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Como o ADHP transforma o estudo de algoritmos
-          </h2>
-          <p class="text-sm text-slate-300">
-            A combinação de desafios estruturados, feedback imediato em sandbox e ciência da memória humana.
+    <section class="how" id="metodologia">
+      <div class="section-top">
+        <h2>Um passo de cada vez.</h2>
+        <p>Da primeira tentativa à próxima descoberta.</p>
+      </div>
+      <div class="steps">
+        <article>
+          <span class="stepnum">01 / ESCOLHER</span>
+          <h3>Encontre seu ponto de partida</h3>
+          <p>
+            Siga as listas organizadas pelo professor e pratique os conceitos que está aprendendo.
           </p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
-          <!-- Step 1: Trilhas -->
-          <div class="mimo-card-interactive p-7 space-y-5 flex flex-col justify-between">
-            <div class="space-y-4">
-              <div class="flex items-center justify-between">
-                <span class="w-10 h-10 rounded-2xl bg-purple-500/20 border border-purple-500/30 text-purple-300 flex items-center justify-center font-bold text-sm">
-                  01
-                </span>
-                <span class="text-xs font-bold uppercase tracking-wider text-purple-300 font-mono">Estrutura</span>
-              </div>
-              <h3 class="text-lg font-bold text-white">Desafios Progressivos</h3>
-              <p class="text-sm text-slate-300 leading-relaxed">
-                Listas organizadas pelo professor para guiar seu raciocínio do primeiro conceito até estruturas de dados avançadas, com requisitos claros.
-              </p>
-            </div>
-
-            <!-- Mini Graphic: Roadmap Node Tree -->
-            <div class="p-3.5 rounded-xl bg-[#0f1120] border border-[#252b4c] space-y-2 text-xs">
-              <div class="flex items-center justify-between text-slate-300">
-                <span class="flex items-center gap-2">
-                  <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                  <span>1. Fundamentos &amp; Sintaxe</span>
-                </span>
-                <span class="text-emerald-400 font-bold">✓</span>
-              </div>
-              <div class="flex items-center justify-between text-white font-semibold">
-                <span class="flex items-center gap-2">
-                  <span class="w-2 h-2 rounded-full bg-purple-400"></span>
-                  <span>2. Condicionais &amp; Laços</span>
-                </span>
-                <span class="text-purple-300 text-[11px]">Atual</span>
-              </div>
-              <div class="flex items-center justify-between text-slate-500">
-                <span class="flex items-center gap-2">
-                  <span class="w-2 h-2 rounded-full bg-slate-600"></span>
-                  <span>3. Slices &amp; Ponteiros</span>
-                </span>
-                <span class="text-slate-600 text-[11px]">Bloqueado</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Step 2: Feedback Instantâneo -->
-          <div class="mimo-card-interactive p-7 space-y-5 flex flex-col justify-between">
-            <div class="space-y-4">
-              <div class="flex items-center justify-between">
-                <span class="w-10 h-10 rounded-2xl bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 flex items-center justify-center font-bold text-sm">
-                  02
-                </span>
-                <span class="text-xs font-bold uppercase tracking-wider text-cyan-300 font-mono">Execução</span>
-              </div>
-              <h3 class="text-lg font-bold text-white">Feedback em Sandbox</h3>
-              <p class="text-sm text-slate-300 leading-relaxed">
-                Ao submeter o código, a plataforma executa sua solução em contêineres isolados, testando casos normais e extremos em milissegundos.
-              </p>
-            </div>
-
-            <!-- Mini Graphic: Terminal Pass Box -->
-            <div class="p-3.5 rounded-xl bg-[#0f1120] border border-[#252b4c] font-mono text-[11px] space-y-1.5 text-slate-300">
-              <div class="text-slate-500">$ go test -v ./...</div>
-              <div class="text-emerald-400 flex items-center gap-1.5">
-                <i class="pi pi-check text-[10px]"></i> PASS: TestSomaPares (0.012s)
-              </div>
-              <div class="text-emerald-400 flex items-center gap-1.5">
-                <i class="pi pi-check text-[10px]"></i> PASS: TestListaVazia (0.008s)
-              </div>
-              <div class="text-cyan-300 font-bold pt-1 border-t border-[#222746]">
-                Resultado: 100% de cobertura
-              </div>
-            </div>
-          </div>
-
-          <!-- Step 3: Repetição Espaçada -->
-          <div class="mimo-card-interactive p-7 space-y-5 flex flex-col justify-between">
-            <div class="space-y-4">
-              <div class="flex items-center justify-between">
-                <span class="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 flex items-center justify-center font-bold text-sm">
-                  03
-                </span>
-                <span class="text-xs font-bold uppercase tracking-wider text-emerald-300 font-mono">Memória</span>
-              </div>
-              <h3 class="text-lg font-bold text-white">Retenção de Longo Prazo</h3>
-              <p class="text-sm text-slate-300 leading-relaxed">
-                Baseado na curva de Hermann Ebbinghaus. Exercícios resolvidos retornam em intervalos calculados (1h, 9h, 1d, 6d, 31d) para combater o esquecimento.
-              </p>
-            </div>
-
-            <!-- Mini Graphic: Spaced Repetition vs Natural Decay -->
-            <div class="p-3.5 rounded-xl bg-[#0f1120] border border-[#252b4c] space-y-2 text-xs">
-              <div class="flex items-center justify-between text-slate-400">
-                <span>Sem repetição:</span>
-                <span class="text-rose-400 font-semibold font-mono">~20% em 30d</span>
-              </div>
-              <div class="w-full bg-[#1b203c] h-1.5 rounded-full overflow-hidden">
-                <div class="bg-rose-500 h-full w-[20%]"></div>
-              </div>
-              <div class="flex items-center justify-between text-white font-semibold pt-1">
-                <span class="text-emerald-300 flex items-center gap-1">
-                  <i class="pi pi-check-circle text-xs"></i> Com ADHP:
-                </span>
-                <span class="text-emerald-400 font-bold font-mono">92% fixado</span>
-              </div>
-              <div class="w-full bg-[#1b203c] h-1.5 rounded-full overflow-hidden">
-                <div class="bg-emerald-400 h-full w-[92%]"></div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
+        </article>
+        <article>
+          <span class="stepnum">02 / EXPERIMENTAR</span>
+          <h3>Escreva, teste, entenda</h3>
+          <p>
+            Veja o resultado da sua solução. Se algo não funcionar, use a dica e experimente outro
+            caminho.
+          </p>
+        </article>
+        <article>
+          <span class="stepnum">03 / REVISITAR</span>
+          <h3>Volte ao que aprendeu</h3>
+          <p>
+            Retome os exercícios nas revisões para praticar novamente e fortalecer seu aprendizado.
+          </p>
+        </article>
       </div>
     </section>
-
-    <!-- ========================================== -->
-    <!-- SECTION 3: TRILHAS DE CÓDIGO (COURSES)     -->
-    <!-- ========================================== -->
-    <section id="trilhas" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-      
-      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-        <div class="space-y-2">
-          <span class="mimo-badge mimo-badge-blue uppercase tracking-wider text-xs font-bold">
-            Catálogo de Trilhas
-          </span>
-          <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Linguagens Suportadas
-          </h2>
-          <p class="text-sm text-slate-300">
-            Ambientes prontos com compilador e interpretador integrados para prática imediata no navegador.
-          </p>
-        </div>
-
-        <NuxtLink 
-          to="/account/createaccount" 
-          class="text-sm font-bold text-purple-300 hover:text-purple-200 transition flex items-center gap-1.5"
-        >
-          <span>Criar conta de estudante</span>
-          <i class="pi pi-arrow-right text-xs"></i>
-        </NuxtLink>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        
-        <!-- Track 1: Golang -->
-        <div class="mimo-card-interactive p-8 space-y-6 border-[#2d355c]">
-          <div class="flex items-start justify-between">
-            <div class="flex items-center gap-4">
-              <span class="w-14 h-14 rounded-2xl bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 flex items-center justify-center font-extrabold text-xl shadow-inner">
-                Go
-              </span>
-              <div>
-                <h3 class="text-xl font-extrabold text-white">Trilha Golang</h3>
-                <span class="text-xs text-cyan-300 font-semibold">Linguagem Compilada e Concorrente</span>
-              </div>
-            </div>
-            <span class="mimo-badge mimo-badge-blue text-[11px]">Básico ao Avançado</span>
-          </div>
-
-          <p class="text-sm text-slate-300 leading-relaxed">
-            Estruture seu raciocínio com a sintaxe robusta de Go. Pratique tipos estáticos, ponteiros, slices, structs, interfaces e algoritmos concorrentes.
-          </p>
-
-          <div class="p-4 rounded-xl bg-[#0f1120] border border-[#252b4c] space-y-2.5 text-xs text-slate-300">
-            <div class="flex items-center gap-2">
-              <i class="pi pi-check text-cyan-400 text-xs"></i>
-              <span>Avaliação automatizada com a biblioteca nativa <code class="text-cyan-300">testing</code></span>
-            </div>
-            <div class="flex items-center gap-2">
-              <i class="pi pi-check text-cyan-400 text-xs"></i>
-              <span>Diagnóstico detalhado de erros de compilação</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <i class="pi pi-check text-cyan-400 text-xs"></i>
-              <span>Execução em contêiner isolado no backend Go</span>
-            </div>
-          </div>
-
-          <div class="pt-2">
-            <NuxtLink 
-              to="/account/createaccount" 
-              class="w-full mimo-btn-blue py-3 text-sm"
-            >
-              <span>Explorar Trilha de Go</span>
-              <i class="pi pi-arrow-right text-xs"></i>
-            </NuxtLink>
-          </div>
-        </div>
-
-        <!-- Track 2: Python -->
-        <div class="mimo-card-interactive p-8 space-y-6 border-[#2d355c]">
-          <div class="flex items-start justify-between">
-            <div class="flex items-center gap-4">
-              <span class="w-14 h-14 rounded-2xl bg-amber-400/20 border border-amber-400/30 text-amber-300 flex items-center justify-center font-extrabold text-xl shadow-inner">
-                Py
-              </span>
-              <div>
-                <h3 class="text-xl font-extrabold text-white">Trilha Python</h3>
-                <span class="text-xs text-amber-300 font-semibold">Lógica e Estruturas de Dados</span>
-              </div>
-            </div>
-            <span class="mimo-badge mimo-badge-amber text-[11px]">Iniciante Amigável</span>
-          </div>
-
-          <p class="text-sm text-slate-300 leading-relaxed">
-            Foque diretamente na resolução do algoritmo. Pratique estruturas de repetição, listas, dicionários, funções puras e manipulação de strings.
-          </p>
-
-          <div class="p-4 rounded-xl bg-[#0f1120] border border-[#252b4c] space-y-2.5 text-xs text-slate-300">
-            <div class="flex items-center gap-2">
-              <i class="pi pi-check text-amber-400 text-xs"></i>
-              <span>Bateria de testes unitários com asserções detalhadas</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <i class="pi pi-check text-amber-400 text-xs"></i>
-              <span>Retorno claro de stdout e stderr para depuração</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <i class="pi pi-check text-amber-400 text-xs"></i>
-              <span>Raciocínio lógico acelerado com foco no problema</span>
-            </div>
-          </div>
-
-          <div class="pt-2">
-            <NuxtLink 
-              to="/account/createaccount" 
-              class="w-full mimo-btn-primary py-3 text-sm"
-            >
-              <span>Explorar Trilha de Python</span>
-              <i class="pi pi-arrow-right text-xs"></i>
-            </NuxtLink>
-          </div>
-        </div>
-
-      </div>
-
-    </section>
-
-    <!-- ========================================== -->
-    <!-- SECTION 4: IMPACTO ACADÊMICO (DUAL IMPACT) -->
-    <!-- ========================================== -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-      
-      <div class="max-w-2xl space-y-2">
-        <span class="mimo-badge mimo-badge-emerald uppercase tracking-wider text-xs font-bold">
-          Benefícios Reais
-        </span>
-        <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-          Projetado para as duas pontas da sala de aula
-        </h2>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        
-        <!-- For Students -->
-        <div class="mimo-card p-8 space-y-5 border-[#2c345a]">
-          <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 flex items-center justify-center text-xl">
-            <i class="pi pi-graduation-cap"></i>
-          </div>
-          <h3 class="text-xl font-bold text-white">Para o Estudante (Discente)</h3>
-          <ul class="space-y-3.5 text-sm text-slate-300 leading-relaxed">
-            <li class="flex items-start gap-2.5">
-              <i class="pi pi-check text-emerald-400 mt-1 text-xs"></i>
-              <span><strong>Fim da incerteza:</strong> receba feedback imediato se a lógica está correta sem precisar esperar o próximo dia de aula.</span>
-            </li>
-            <li class="flex items-start gap-2.5">
-              <i class="pi pi-check text-emerald-400 mt-1 text-xs"></i>
-              <span><strong>Dicas pedagógicas:</strong> orientações cadastradas pelo professor para destravar sem entregar a resposta pronta.</span>
-            </li>
-            <li class="flex items-start gap-2.5">
-              <i class="pi pi-check text-emerald-400 mt-1 text-xs"></i>
-              <span><strong>Memória permanente:</strong> as revisões espaçadas impedem que você esqueça a sintaxe dias antes da avaliação final.</span>
-            </li>
-          </ul>
-        </div>
-
-        <!-- For Teachers -->
-        <div class="mimo-card p-8 space-y-5 border-[#2c345a]">
-          <div class="w-12 h-12 rounded-2xl bg-purple-500/20 border border-purple-500/30 text-purple-300 flex items-center justify-center text-xl">
-            <i class="pi pi-user-edit"></i>
-          </div>
-          <h3 class="text-xl font-bold text-white">Para o Docente (Professor)</h3>
-          <ul class="space-y-3.5 text-sm text-slate-300 leading-relaxed">
-            <li class="flex items-start gap-2.5">
-              <i class="pi pi-check text-purple-400 mt-1 text-xs"></i>
-              <span><strong>Zero correção manual:</strong> a suíte de testes unitários automatizada substitui horas de compilação manual de arquivos.</span>
-            </li>
-            <li class="flex items-start gap-2.5">
-              <i class="pi pi-check text-purple-400 mt-1 text-xs"></i>
-              <span><strong>Gestão completa de listas:</strong> crie trilhas, organize sequências pedagógicas e configure múltiplos casos de teste.</span>
-            </li>
-            <li class="flex items-start gap-2.5">
-              <i class="pi pi-check text-purple-400 mt-1 text-xs"></i>
-              <span><strong>Métricas de retenção:</strong> acompanhe a taxa de acerto na primeira tentativa vs nas repetições espaçadas da turma.</span>
-            </li>
-          </ul>
-        </div>
-
-      </div>
-
-    </section>
-
-    <!-- ========================================== -->
-    <!-- BOTTOM CALL TO ACTION BANNER               -->
-    <!-- ========================================== -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="mimo-card p-8 sm:p-12 border-[#363e69] bg-[#161a33] flex flex-col md:flex-row md:items-center justify-between gap-8">
-        <div class="space-y-2 max-w-xl">
-          <h3 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Pronto para colocar sua lógica à prova?
-          </h3>
-          <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
-            Crie sua conta gratuitamente para resolver os desafios das trilhas de Golang e Python.
-          </p>
-        </div>
-
-        <div class="flex items-center gap-4 shrink-0">
-          <NuxtLink 
-            v-if="!isAuthenticated" 
-            to="/account/createaccount" 
-            class="mimo-btn-primary px-7 py-3.5 text-base"
+    <section class="practice" id="trilhas">
+      <div class="practice-grid">
+        <div>
+          <h2>O que você vai praticar</h2>
+          <NuxtLink
+            class="row"
+            :to="
+              isAuthenticated
+                ? $authService.isDocente()
+                  ? '/dashboard_docente'
+                  : '/dashboard_discente'
+                : '/account/createaccount'
+            "
+            ><span class="lang">Py</span
+            ><span
+              ><strong>Lógica de programação com Python</strong
+              ><small>Variáveis, condições e repetições</small></span
+            ><span class="arrow">↗</span></NuxtLink
+          ><NuxtLink
+            class="row"
+            :to="
+              isAuthenticated
+                ? $authService.isDocente()
+                  ? '/dashboard_docente'
+                  : '/dashboard_discente'
+                : '/account/createaccount'
+            "
+            ><span class="lang" style="background: #e5edf0; color: #3e6a7d">Go</span
+            ><span
+              ><strong>Lógica de programação com Go</strong
+              ><small>Uma outra linguagem para explorar os fundamentos</small></span
+            ><span class="arrow">↗</span></NuxtLink
           >
-            <span>Cadastrar Como Aluno</span>
-            <i class="pi pi-arrow-right text-xs"></i>
-          </NuxtLink>
-          <button 
-            v-else 
-            @click="redirectToDashboard" 
-            class="mimo-btn-primary px-7 py-3.5 text-base"
-          >
-            <span>Ir Para o Meu Painel</span>
-            <i class="pi pi-arrow-right text-xs"></i>
-          </button>
         </div>
+        <aside class="aside">
+          <h3>Aprender também é retomar.</h3>
+          <p>
+            As revisões espaçadas ajudam você a voltar aos exercícios ao longo do tempo. Seu painel
+            reúne as atividades e as próximas revisões.
+          </p>
+        </aside>
       </div>
     </section>
-
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted } from "vue";
 
 const route = useRoute();
 const isAuthenticated = ref(false);
-const activeCodeTab = ref<'python' | 'golang'>('python');
+const exampleExecuted = ref(false);
 const { $authService } = useNuxtApp();
 
 const redirectToDashboard = () => {
@@ -641,7 +140,7 @@ const redirectToDashboard = () => {
 const checkIsAuthenticated = () => {
   if ($authService.isAuthenticated()) {
     try {
-      const jwtPayload = $authService.parseJwt($authService.getToken() || '');
+      const jwtPayload = $authService.parseJwt($authService.getToken() || "");
       if (jwtPayload && jwtPayload.exp && jwtPayload.exp < Date.now() / 1000) {
         $authService.logout();
       }
@@ -660,3 +159,272 @@ onMounted(() => {
   checkIsAuthenticated();
 });
 </script>
+<style scoped>
+.hero {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 78px;
+  align-items: center;
+  padding: 82px 0 70px;
+}
+.eyebrow {
+  color: #596f61;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+}
+h1 {
+  font-size: 49px;
+  line-height: 1.14;
+  font-weight: 650;
+  letter-spacing: -2px;
+  max-width: 530px;
+  margin: 20px 0 23px;
+}
+h1 em {
+  font-style: normal;
+  color: #285b75;
+}
+.intro {
+  color: #65706b;
+  max-width: 465px;
+  font-size: 17px;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-top: 28px;
+}
+.textlink {
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+.note {
+  font-size: 12px;
+  color: #727b74;
+  margin-top: 17px;
+}
+.example {
+  background: white;
+  border: 1px solid #dce0d8;
+  border-radius: 10px;
+  box-shadow: 0 12px 30px #303a3210;
+  overflow: hidden;
+}
+.example-label {
+  padding: 17px 23px;
+  border-bottom: 1px solid #e8eae4;
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+.example-label span {
+  color: #798278;
+  font-size: 12px;
+}
+.exercise {
+  padding: 22px 24px 18px;
+}
+.exercise h3 {
+  font-size: 19px;
+  margin: 0 0 7px;
+  font-weight: 600;
+}
+.exercise p {
+  font-size: 14px;
+  color: #6b746d;
+  margin: 0;
+}
+.code {
+  margin: 0 22px;
+  background: #202d35;
+  color: #e7ebec;
+  border-radius: 6px;
+  padding: 23px 17px;
+  font: 14px/1.95 monospace;
+}
+.line {
+  color: #7e8b92;
+  display: inline-block;
+  width: 24px;
+  user-select: none;
+}
+.str {
+  color: #ddc08c;
+}
+.func {
+  color: #96c2d7;
+}
+.run {
+  padding: 16px 23px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.run button {
+  font-size: 12px;
+  padding: 9px 15px;
+}
+.run span {
+  font-size: 12px;
+  color: #7b817c;
+}
+.output {
+  margin: 0 23px 23px;
+  background: #f1f5ee;
+  border-left: 3px solid #7d9c6e;
+  padding: 12px 15px;
+  font-size: 13px;
+}
+.output small {
+  display: block;
+  font-size: 10px;
+  color: #6e7b67;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+.caption {
+  text-align: center;
+  font-size: 12px;
+  color: #798175;
+  margin-top: 15px;
+}
+.how {
+  border-top: 1px solid #dce0d7;
+  padding: 39px 0 48px;
+}
+.section-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 25px;
+}
+h2 {
+  font-size: 25px;
+  letter-spacing: -0.6px;
+  font-weight: 600;
+  margin: 0 0 26px;
+}
+.section-top p {
+  font-size: 13px;
+  color: #778075;
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 46px;
+}
+.stepnum {
+  font: 13px monospace;
+  color: #7d8c76;
+}
+.steps h3 {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 11px 0 9px;
+}
+.steps p {
+  font-size: 14px;
+  color: #697369;
+  margin: 0;
+}
+.practice {
+  padding: 35px 0 52px;
+}
+.practice-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 70px;
+}
+.row {
+  border-top: 1px solid #dce0d7;
+  padding: 17px 0;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.lang {
+  width: 40px;
+  height: 40px;
+  background: #ecece2;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  font: 13px monospace;
+  color: #625f40;
+}
+.row strong {
+  font-size: 15px;
+  font-weight: 600;
+  display: block;
+}
+.row small {
+  font-size: 12px;
+  color: #7a8175;
+}
+.arrow {
+  margin-left: auto;
+  color: #285b75;
+}
+.aside {
+  border-left: 2px solid #c9d4c0;
+  padding: 0 0 0 24px;
+  align-self: center;
+}
+.aside h3 {
+  font-size: 18px;
+  font-weight: 550;
+  margin: 0 0 8px;
+}
+.aside p {
+  font-size: 14px;
+  color: #697369;
+  margin: 0;
+}
+@media (max-width: 760px) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 35px;
+    padding: 42px 0;
+  }
+  h1 {
+    font-size: 38px;
+  }
+  .steps,
+  .practice-grid {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+  .section-top {
+    display: block;
+  }
+  .section-top p {
+    margin-top: -15px;
+    margin-bottom: 25px;
+  }
+  .hero .example {
+    transform: none;
+  }
+  .practice-grid {
+    gap: 32px;
+  }
+  .actions {
+    gap: 17px;
+    flex-wrap: wrap;
+  }
+  .code {
+    font-size: 13px;
+  }
+  .run {
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .aside {
+    margin-bottom: 10px;
+  }
+}
+</style>

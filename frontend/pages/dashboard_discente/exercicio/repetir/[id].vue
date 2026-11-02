@@ -3,140 +3,126 @@
     <Toast />
     <ConfirmDialog />
 
-    <!-- Top Navigation / Breadcrumb -->
-    <div class="flex items-center justify-between pb-2 border-b border-white/[0.08]">
-      <NuxtLink 
-        to="/dashboard_discente" 
-        class="inline-flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-white transition"
+    <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+      <NuxtLink
+        to="/dashboard_discente"
+        class="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-800 transition"
       >
-        <i class="pi pi-arrow-left text-xs"></i>
+        <i class="pi pi-arrow-left text-sm"></i>
         <span>Voltar ao Painel</span>
       </NuxtLink>
 
-      <span class="mimo-badge mimo-badge-indigo text-[11px]">
-        Modo de Repetição Espaçada
-      </span>
+      <span class="study-badge study-badge-indigo text-[11px]"> Modo de Repetição Espaçada </span>
     </div>
 
-    <!-- FORM WORKSPACE -->
-    <Form 
-      v-slot="$form" 
-      :initialValues="initialValues" 
-      :resolver="resolver" 
-      @submit="onFormSubmit" 
+    <Form
+      v-slot="$form"
+      :initialValues="initialValues"
+      :resolver="resolver"
+      @submit="onFormSubmit"
       class="w-full flex flex-col gap-6"
     >
-      <!-- Exercise Header Card (Mimo Style) -->
-      <div class="mimo-card p-6 border-[#363e66] bg-[#1c2038] shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div
+        class="study-card p-6 border-[#dce1d9] bg-[#ffffff] shadow-none flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+      >
         <div class="space-y-1.5">
           <div class="flex items-center gap-2.5">
-            <span 
-              class="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider"
-              :class="tipoDaLinguagem === 1 ? 'mimo-badge-blue' : 'mimo-badge-amber'"
+            <span
+              class="px-2.5 py-0.5 rounded-full text-sm font-semibold"
+              :class="tipoDaLinguagem === 1 ? 'study-badge-blue' : 'study-badge-amber'"
             >
-              {{ tipoDaLinguagem === 1 ? 'Golang' : 'Python' }}
+              {{ tipoDaLinguagem === 1 ? "Golang" : "Python" }}
             </span>
-            <span class="text-xs text-purple-300 font-medium">• Revisão Agendada</span>
+            <span class="text-sm text-sky-800 font-medium">• Revisão Agendada</span>
           </div>
-          <h1 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
-            {{ exercicio.name || 'Exercício' }}
+          <h1 class="text-xl sm:text-2xl font-semibold text-slate-800 tracking-tight">
+            {{ exercicio.name || "Exercício" }}
           </h1>
         </div>
 
-        <button 
-          type="button" 
+        <button
+          type="button"
           @click="showFeedback(exercicio)"
-          class="mimo-btn-secondary px-4 py-2 text-xs flex items-center gap-2"
+          class="study-btn-secondary px-4 py-2 text-sm flex items-center gap-2"
         >
-          <i class="pi pi-info-circle text-xs text-purple-300"></i>
-          <span>Ver Dica do Exercício</span>
+          <i class="pi pi-info-circle text-sm text-sky-800"></i>
+          <span>Preciso de uma dica</span>
         </button>
       </div>
 
-      <!-- Monaco Editor Workspace Frame (Mimo Style) -->
-      <div class="rounded-2xl border border-[#363e66] overflow-hidden bg-[#15172a] shadow-xl">
-        <!-- Window Bar -->
-        <div class="flex items-center justify-between px-4 py-2.5 bg-[#1e233d] border-b border-[#2d3458]">
-          <div class="flex items-center gap-1.5">
-            <span class="w-2.5 h-2.5 rounded-full bg-slate-600"></span>
-            <span class="w-2.5 h-2.5 rounded-full bg-slate-600"></span>
-            <span class="w-2.5 h-2.5 rounded-full bg-slate-600"></span>
-          </div>
-
-          <div class="flex items-center gap-2 px-3 py-1 rounded-lg bg-[#141628] text-xs font-mono text-purple-300 border border-[#2d3458]">
-            <i class="pi pi-file text-purple-400 text-xs"></i>
-            <span>{{ tipoDaLinguagem === 1 ? 'repeticao.go' : 'repeticao.py' }}</span>
-          </div>
-
-          <span class="text-[11px] text-slate-400 font-mono hidden sm:inline-block">Monaco Editor</span>
+      <div class="editor-panel">
+        <div class="editor-toolbar">
+          <span>{{ tipoDaLinguagem === 1 ? "revisao.go" : "revisao.py" }}</span
+          ><span>Hora de praticar novamente</span>
         </div>
-
-        <!-- Monaco Editor Mount -->
         <div class="relative w-full">
-          <MonacoEditor 
-            name="codigo_base" 
-            v-model="exercicio.codigo_base" 
-            :options="optionsEditor" 
-            :lang="tipoDaLinguagem === 1 ? 'go' : 'python'" 
-            class="h-[460px] sm:h-[520px] w-full z-10" 
+          <MonacoEditor
+            name="codigo_base"
+            v-model="exercicio.codigo_base"
+            :options="optionsEditor"
+            :lang="tipoDaLinguagem === 1 ? 'go' : 'python'"
+            class="h-[460px] sm:h-[520px] w-full z-10"
           />
         </div>
       </div>
 
-      <!-- Output Consoles (Stdout & Tests) -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        
-        <!-- Console 1: Execução -->
-        <div class="rounded-2xl border border-[#363e66] overflow-hidden bg-[#16182c] shadow-lg flex flex-col">
-          <div class="flex items-center justify-between px-4 py-2.5 bg-[#1e233d] border-b border-[#2d3458]">
+        <div
+          class="rounded-lg border border-[#dce1d9] overflow-hidden bg-[#ffffff] shadow-none flex flex-col"
+        >
+          <div
+            class="flex items-center justify-between px-4 py-2.5 bg-[#ffffff] border-b border-[#dce1d9]"
+          >
             <div class="flex items-center gap-2">
-              <i class="pi pi-terminal text-slate-400 text-xs"></i>
-              <span class="text-xs font-bold text-slate-200">Saída da Execução (Stdout/Stderr)</span>
+              <i class="pi pi-terminal text-slate-600 text-sm"></i>
+              <span class="text-sm font-semibold text-slate-700">Saída do programa</span>
             </div>
           </div>
-          <div class="p-3.5 flex-1 bg-[#121424]">
-            <textarea 
-              v-model="retorno_codigo" 
-              readonly 
-              placeholder="A saída padrão do seu código aparecerá aqui..." 
-              class="w-full h-32 bg-transparent text-slate-300 font-mono text-xs resize-none focus:outline-none placeholder-slate-600 leading-relaxed"
+          <div class="p-3.5 flex-1 bg-[#ffffff]">
+            <textarea
+              v-model="retorno_codigo"
+              readonly
+              placeholder="A saída padrão do seu código aparecerá aqui..."
+              class="w-full h-32 bg-transparent text-slate-600 font-mono text-sm resize-none focus-visible:outline-sky-800 placeholder-slate-600 leading-relaxed"
             ></textarea>
           </div>
         </div>
 
-        <!-- Console 2: Testes Unitários -->
-        <div class="rounded-2xl border border-[#363e66] overflow-hidden bg-[#16182c] shadow-lg flex flex-col">
-          <div class="flex items-center justify-between px-4 py-2.5 bg-[#1e233d] border-b border-[#2d3458]">
+        <div
+          class="rounded-lg border border-[#dce1d9] overflow-hidden bg-[#ffffff] shadow-none flex flex-col"
+        >
+          <div
+            class="flex items-center justify-between px-4 py-2.5 bg-[#ffffff] border-b border-[#dce1d9]"
+          >
             <div class="flex items-center gap-2">
-              <i class="pi pi-verified text-emerald-400 text-xs"></i>
-              <span class="text-xs font-bold text-slate-200">Resultado dos Testes Unitários</span>
+              <i class="pi pi-verified text-emerald-700 text-sm"></i>
+              <span class="text-sm font-semibold text-slate-700">Resultado da verificação</span>
             </div>
           </div>
-          <div class="p-3.5 flex-1 bg-[#121424]">
-            <textarea 
-              v-model="retorno_teste" 
-              readonly 
-              placeholder="O relatório da bateria de testes aparecerá aqui..." 
-              class="w-full h-32 bg-transparent text-emerald-400 font-mono text-xs resize-none focus:outline-none placeholder-slate-600 leading-relaxed"
+          <div class="p-3.5 flex-1 bg-[#ffffff]">
+            <textarea
+              v-model="retorno_teste"
+              readonly
+              placeholder="O relatório da bateria de testes aparecerá aqui..."
+              class="w-full h-32 bg-transparent text-emerald-700 font-mono text-sm resize-none focus-visible:outline-sky-800 placeholder-slate-600 leading-relaxed"
             ></textarea>
           </div>
         </div>
-
       </div>
 
-      <!-- Action Button -->
       <div class="flex justify-end pt-2">
-        <button 
-          type="submit" 
-          class="mimo-btn-primary px-8 py-3 text-sm font-bold flex items-center justify-center gap-2"
+        <button
+          type="submit"
+          class="study-btn-primary px-8 py-3 text-sm font-semibold flex items-center justify-center gap-2"
         >
-          <i class="pi pi-check text-xs"></i>
+          <i class="pi pi-check text-sm"></i>
           <span>Submeter Revisão Espaçada</span>
         </button>
       </div>
     </Form>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import * as Monaco from 'monaco-editor';
@@ -200,7 +186,7 @@ const showFeedback = async (e: PrimeVueDataExercicio) => {
     } else {
       toast.add({ severity: 'error', summary: 'Erro', detail: "Erro ao requisitar o feedback.", life: 3000 });
     }
-  } catch (error) {    
+  } catch (error) {
     console.log(error);
   }
 };

@@ -3,87 +3,99 @@
     <Toast />
     <ConfirmDialog />
 
-    <ManipuladorTrilha 
-      v-model="visibleFormManipulador" 
+    <ManipuladorTrilha
+      v-model="visibleFormManipulador"
       :isUpdate="isUpdateDialog"
       :trilhaID="trilhaID"
-      @some-event="getTrilhasListaExercicios" 
-      @blur="formManipulador()" 
+      @some-event="getTrilhasListaExercicios"
+      @blur="formManipulador()"
     />
 
-    <!-- TEACHER WELCOME BANNER (Mimo Style) -->
-    <div class="mimo-card p-6 sm:p-7 border-[#363e66] bg-[#1c2038] shadow-xl">
+    <div class="study-card p-6 sm:p-7 border-[#dce1d9] bg-[#ffffff] shadow-none">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-5">
         <div class="space-y-1.5">
-          <div class="inline-flex items-center gap-1.5 text-xs text-purple-300 font-bold uppercase tracking-wider">
+          <div class="inline-flex items-center gap-1.5 text-sm text-sky-800 font-semibold">
             <i class="pi pi-user-edit text-[11px]"></i>
             <span>Painel do Docente / Instrutor</span>
           </div>
-          <h1 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+          <h1 class="text-xl sm:text-2xl font-semibold text-slate-800 tracking-tight">
             Gestão de Trilhas e Listas de Exercícios
           </h1>
-          <p class="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
-            Crie novos conteúdos, estruture as listas de exercícios sequenciais e configure a suíte de testes unitários.
+          <p class="text-sm sm:text-sm text-slate-600 max-w-xl leading-relaxed">
+            Crie novos conteúdos, estruture as listas de exercícios sequenciais e configure a suíte
+            de testes unitários.
           </p>
         </div>
 
-        <button 
+        <button
           @click="formManipulador()"
-          class="mimo-btn-primary px-5 py-2.5 text-xs font-bold flex items-center gap-2"
+          class="study-btn-primary px-5 py-2.5 text-sm font-semibold flex items-center gap-2"
         >
-          <i class="pi pi-plus text-xs"></i>
+          <i class="pi pi-plus text-sm"></i>
           <span>Nova Trilha</span>
         </button>
       </div>
     </div>
 
-    <!-- TRILHAS LIST -->
-    <div v-if="!trilhas || trilhas.length === 0" class="mimo-card p-12 text-center border border-white/10">
+    <div
+      v-if="!trilhas || trilhas.length === 0"
+      class="study-card p-12 text-center border border-slate-200"
+    >
       <i class="pi pi-folder-open text-4xl text-slate-500 mb-3 block"></i>
-      <p class="text-slate-400 text-sm mb-4">Nenhuma trilha cadastrada ainda.</p>
-      <button 
+      <p class="text-slate-600 text-sm mb-4">Nenhuma trilha cadastrada ainda.</p>
+      <button
         @click="formManipulador()"
-        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 transition"
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-slate-800 bg-blue-600 hover:bg-blue-500 transition"
       >
-        <i class="pi pi-plus text-xs"></i>
+        <i class="pi pi-plus text-sm"></i>
         <span>Criar Primeira Trilha</span>
       </button>
     </div>
 
     <div v-else class="space-y-8">
-      <div 
-        v-for="trilha in trilhas" 
+      <div
+        v-for="trilha in trilhas"
         :key="trilha.id"
-        class="mimo-card p-6 sm:p-8 border-[#363e66] bg-[#1c2038] shadow-xl space-y-6"
+        class="study-card p-6 sm:p-8 border-[#dce1d9] bg-[#ffffff] shadow-none space-y-6"
       >
-        <!-- Trilha Topbar -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-[#2d3458] gap-4">
+        <div
+          class="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-[#dce1d9] gap-4"
+        >
           <div class="flex items-center gap-3.5">
-            <span 
-              class="w-12 h-12 rounded-2xl flex items-center justify-center font-extrabold text-base shadow-md"
-              :class="trilha.tipo_da_linguagem === 1 ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' : 'bg-amber-400/20 text-amber-300 border border-amber-400/30'"
+            <span
+              class="w-12 h-12 rounded-lg flex items-center justify-center font-semibold text-base shadow-md"
+              :class="
+                trilha.tipo_da_linguagem === 1
+                  ? 'bg-cyan-500/20 text-sky-800 border border-cyan-500/30'
+                  : 'bg-amber-400/20 text-amber-800 border border-amber-400/30'
+              "
             >
-              {{ trilha.tipo_da_linguagem === 1 ? 'Go' : 'Py' }}
+              {{ trilha.tipo_da_linguagem === 1 ? "Go" : "Py" }}
             </span>
             <div>
-              <h2 class="text-xl font-extrabold text-white tracking-tight">{{ trilha.name }}</h2>
-              <span class="text-xs text-slate-300 font-medium">
-                {{ trilha.tipo_da_linguagem === 1 ? 'Golang' : 'Python' }} • {{ trilha.listas?.length || 0 }} Listas
+              <h2 class="text-xl font-semibold text-slate-800 tracking-tight">{{ trilha.name }}</h2>
+              <span class="text-sm text-slate-600 font-medium">
+                {{ trilha.tipo_da_linguagem === 1 ? "Golang" : "Python" }} •
+                {{ trilha.listas?.length || 0 }} Listas
               </span>
             </div>
           </div>
 
           <div class="flex items-center gap-2">
-            <button 
-              @click="isUpdateDialog = true; trilhaID = trilha.id; visibleFormManipulador = true" 
-              class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-amber-300 bg-amber-400/10 border border-amber-400/25 hover:bg-amber-400/20 transition"
+            <button
+              @click="
+                isUpdateDialog = true;
+                trilhaID = trilha.id;
+                visibleFormManipulador = true;
+              "
+              class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-semibold text-amber-800 bg-amber-400/10 border border-amber-400/25 hover:bg-amber-400/20 transition"
             >
               <i class="pi pi-pencil text-[11px]"></i>
               <span>Editar Trilha</span>
             </button>
-            <button 
-              @click="confirmarRemoverTrilha(trilha.id)" 
-              class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-rose-300 bg-rose-500/10 border border-rose-500/25 hover:bg-rose-500/20 transition"
+            <button
+              @click="confirmarRemoverTrilha(trilha.id)"
+              class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-semibold text-rose-700 bg-rose-500/10 border border-rose-500/25 hover:bg-rose-500/20 transition"
             >
               <i class="pi pi-trash text-[11px]"></i>
               <span>Excluir</span>
@@ -91,17 +103,18 @@
           </div>
         </div>
 
-        <!-- Listas Accordion inside Trilha -->
         <div class="space-y-4">
           <Accordion :value="['0']" multiple>
             <AccordionPanel v-for="lista in trilha.listas" :key="lista.id" :value="lista.id">
               <AccordionHeader>
                 <div class="flex items-center justify-between w-full pr-4">
                   <div class="flex items-center gap-2.5">
-                    <i class="pi pi-folder text-purple-400 text-sm"></i>
-                    <span class="font-bold text-slate-100">{{ lista.name }}</span>
+                    <i class="pi pi-folder text-sky-800 text-sm"></i>
+                    <span class="font-semibold text-slate-800">{{ lista.name }}</span>
                   </div>
-                  <span class="text-xs px-2.5 py-0.5 rounded-full bg-[#151729] text-slate-300 border border-[#2d3458] font-medium">
+                  <span
+                    class="text-sm px-2.5 py-0.5 rounded-full bg-[#ffffff] text-slate-600 border border-[#dce1d9] font-medium"
+                  >
                     {{ lista.exercicios?.length || 0 }} exercícios
                   </span>
                 </div>
@@ -109,82 +122,90 @@
 
               <AccordionContent>
                 <div class="p-4 space-y-5">
-                  <!-- Header Actions for this Lista -->
-                  <div class="p-4 rounded-xl bg-[#141728] border border-[#2d3458] flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div
+                    class="p-4 rounded-lg bg-[#ffffff] border border-[#dce1d9] flex flex-col md:flex-row md:items-center justify-between gap-4"
+                  >
                     <div class="flex items-center gap-3">
-                      <div v-if="!lista.isEditing" class="text-base font-bold text-white">
+                      <div v-if="!lista.isEditing" class="text-base font-semibold text-slate-800">
                         {{ lista.name }}
                       </div>
                       <div v-else class="flex items-center gap-2">
-                        <InputText v-model="lista.name" class="!py-1.5 !px-3 text-sm" @blur="saveListaName(lista)" />
+                        <InputText
+                          v-model="lista.name"
+                          class="!py-1.5 !px-3 text-sm"
+                          @blur="saveListaName(lista)"
+                        />
                       </div>
                     </div>
 
                     <div class="flex flex-wrap items-center gap-2">
-                      <button 
+                      <button
                         @click="editListaName(lista, true)"
-                        class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 bg-[#1e233d] border border-[#32395e] hover:bg-[#252a48] transition"
+                        class="px-3 py-1.5 rounded-lg text-sm font-semibold text-slate-600 bg-[#ffffff] border border-[#dce1d9] hover:bg-[#ffffff] transition"
                       >
-                        {{ lista.isEditing ? 'Salvar Nome' : 'Renomear' }}
+                        {{ lista.isEditing ? "Salvar Nome" : "Renomear" }}
                       </button>
-                      <button 
-                        @click="alterarIndexLista(trilha.id, lista.id, -1)" 
+                      <button
+                        @click="alterarIndexLista(trilha.id, lista.id, -1)"
                         title="Subir lista"
-                        class="p-1.5 w-8 h-8 rounded-lg text-xs text-slate-300 bg-[#1e233d] border border-[#32395e] hover:bg-[#252a48] transition flex items-center justify-center"
+                        class="p-1.5 w-8 h-8 rounded-lg text-sm text-slate-600 bg-[#ffffff] border border-[#dce1d9] hover:bg-[#ffffff] transition flex items-center justify-center"
                       >
                         <i class="pi pi-arrow-up"></i>
                       </button>
-                      <button 
-                        @click="alterarIndexLista(trilha.id, lista.id, 1)" 
+                      <button
+                        @click="alterarIndexLista(trilha.id, lista.id, 1)"
                         title="Descer lista"
-                        class="p-1.5 w-8 h-8 rounded-lg text-xs text-slate-300 bg-[#1e233d] border border-[#32395e] hover:bg-[#252a48] transition flex items-center justify-center"
+                        class="p-1.5 w-8 h-8 rounded-lg text-sm text-slate-600 bg-[#ffffff] border border-[#dce1d9] hover:bg-[#ffffff] transition flex items-center justify-center"
                       >
                         <i class="pi pi-arrow-down"></i>
                       </button>
-                      <button 
-                        @click="confirmarRemoverLista(lista.id)" 
-                        class="px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-300 bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 transition"
+                      <button
+                        @click="confirmarRemoverLista(lista.id)"
+                        class="px-3 py-1.5 rounded-lg text-sm font-semibold text-rose-700 bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 transition"
                       >
                         Remover Lista
                       </button>
                     </div>
                   </div>
 
-                  <!-- TreeTable of Exercicios -->
                   <TreeTable :value="lista.exercicios" class="w-full">
                     <Column field="name" header="Exercício" expander>
                       <template #body="{ node }">
-                        <span class="font-medium text-slate-200 text-sm">
+                        <span class="font-medium text-slate-700 text-sm">
                           {{ node.data.name }}
                         </span>
                       </template>
                     </Column>
 
-                    <Column header="Ações" style="width: 14rem; text-align: right;">
+                    <Column header="Ações" style="width: 14rem; text-align: right">
                       <template #body="{ node }">
                         <div class="flex items-center justify-end gap-1.5">
-                          <NuxtLink :to="`/dashboard_docente/exercicio/atualizar/${trilha.tipo_da_linguagem}/${node.data.id}`">
-                            <button class="px-2.5 py-1 rounded-md text-xs font-semibold text-cyan-300 bg-cyan-500/10 border border-cyan-500/25 hover:bg-cyan-500/20 transition">
+                          <NuxtLink
+                            :to="`/dashboard_docente/exercicio/atualizar/${trilha.tipo_da_linguagem}/${node.data.id}`"
+                          >
+                            <button
+                              class="px-2.5 py-1 rounded-md text-sm font-semibold text-sky-800 bg-cyan-500/10 border border-cyan-500/25 hover:bg-cyan-500/20 transition"
+                            >
                               Editar
                             </button>
                           </NuxtLink>
-                          <button 
-                            @click="alterarIndexExercicio(lista.id, node.data.id, -1)" 
-                            class="p-1 w-7 h-7 rounded-md text-xs text-slate-300 bg-[#1e233d] border border-[#32395e] hover:bg-[#252a48] transition flex items-center justify-center"
+                          <button
+                            @click="alterarIndexExercicio(lista.id, node.data.id, -1)"
+                            class="p-1 w-7 h-7 rounded-md text-sm text-slate-600 bg-[#ffffff] border border-[#dce1d9] hover:bg-[#ffffff] transition flex items-center justify-center"
                             title="Subir ordem"
                           >
                             <i class="pi pi-arrow-up text-[10px]"></i>
                           </button>
-                          <button 
-                            @click="alterarIndexExercicio(lista.id, node.data.id, 1)" 
-                            class="p-1 w-7 h-7 rounded-md text-xs text-slate-300 bg-[#1e233d] border border-[#32395e] hover:bg-[#252a48] transition flex items-center justify-center"
+                          <button
+                            @click="alterarIndexExercicio(lista.id, node.data.id, 1)"
+                            class="p-1 w-7 h-7 rounded-md text-sm text-slate-600 bg-[#ffffff] border border-[#dce1d9] hover:bg-[#ffffff] transition flex items-center justify-center"
                             title="Descer ordem"
                           >
                             <i class="pi pi-arrow-down text-[10px]"></i>
                           </button>
-                          <button 
-                            @click="removerExercicio(node.data.id)" 
-                            class="p-1 w-7 h-7 rounded-md text-xs text-rose-400 bg-rose-500/10 border border-rose-500/25 hover:bg-rose-500/20 transition flex items-center justify-center"
+                          <button
+                            @click="removerExercicio(node.data.id)"
+                            class="p-1 w-7 h-7 rounded-md text-sm text-rose-700 bg-rose-500/10 border border-rose-500/25 hover:bg-rose-500/20 transition flex items-center justify-center"
                             title="Excluir exercício"
                           >
                             <i class="pi pi-trash text-[10px]"></i>
@@ -194,10 +215,13 @@
                     </Column>
                   </TreeTable>
 
-                  <!-- Footer of Lista: Adicionar Exercício -->
-                  <div class="pt-4 border-t border-[#2d3458] flex justify-end">
-                    <NuxtLink :to="`/dashboard_docente/exercicio/adicionar/${trilha.tipo_da_linguagem}/${lista.id}`">
-                      <button class="mimo-btn-primary px-3.5 py-1.5 text-xs flex items-center gap-1.5">
+                  <div class="pt-4 border-t border-[#dce1d9] flex justify-end">
+                    <NuxtLink
+                      :to="`/dashboard_docente/exercicio/adicionar/${trilha.tipo_da_linguagem}/${lista.id}`"
+                    >
+                      <button
+                        class="study-btn-primary px-3.5 py-1.5 text-sm flex items-center gap-1.5"
+                      >
                         <i class="pi pi-plus text-[10px]"></i>
                         <span>Adicionar Exercício</span>
                       </button>
@@ -208,34 +232,31 @@
             </AccordionPanel>
           </Accordion>
 
-          <!-- Add Lista Button -->
           <div class="pt-2 flex justify-center">
-            <button 
-              @click="addLista(trilha.id)" 
-              class="mimo-btn-secondary px-4 py-2 text-xs flex items-center gap-2"
+            <button
+              @click="addLista(trilha.id)"
+              class="study-btn-secondary px-4 py-2 text-sm flex items-center gap-2"
             >
-              <i class="pi pi-folder-plus text-xs text-purple-300"></i>
+              <i class="pi pi-folder-plus text-sm text-sky-800"></i>
               <span>Adicionar Nova Lista nesta Trilha</span>
             </button>
           </div>
         </div>
-
       </div>
     </div>
 
-    <!-- Bottom Action to add new trilha -->
     <div class="flex justify-center pt-2">
-      <button 
-        @click="formManipulador()" 
-        class="mimo-btn-primary px-6 py-3 text-sm flex items-center gap-2"
+      <button
+        @click="formManipulador()"
+        class="study-btn-primary px-6 py-3 text-sm flex items-center gap-2"
       >
-        <i class="pi pi-plus text-xs"></i>
+        <i class="pi pi-plus text-sm"></i>
         <span>Adicionar Nova Trilha</span>
       </button>
     </div>
-
   </div>
 </template>
+
 
 <script setup lang="ts">
 definePageMeta({
@@ -282,7 +303,7 @@ const onRemoveExercicioById = async (exercicios_id: string) => {
     }
   } catch(err) {
     console.error(err);
-  }  
+  }
 };
 
 const removerExercicio = (exercicio_id: string) => {

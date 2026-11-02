@@ -2,87 +2,86 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
     <Toast />
 
-    <!-- Top Navigation / Breadcrumb -->
-    <div class="flex items-center justify-between pb-2 border-b border-white/[0.08]">
-      <NuxtLink 
-        to="/dashboard_discente" 
-        class="inline-flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-white transition"
+    <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+      <NuxtLink
+        to="/dashboard_discente"
+        class="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-800 transition"
       >
-        <i class="pi pi-arrow-left text-xs"></i>
+        <i class="pi pi-arrow-left text-sm"></i>
         <span>Voltar ao Painel de Trilhas</span>
       </NuxtLink>
 
       <div class="flex items-center gap-2">
-        <span class="mimo-badge mimo-badge-indigo text-[11px]">
-          Lista: {{ lista?.name || 'Carregando...' }}
+        <span class="study-badge study-badge-indigo text-[11px]">
+          Lista: {{ lista?.name || "Carregando..." }}
         </span>
       </div>
     </div>
 
-    <!-- Stepper / Exercise Runner Layout -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-      
-      <!-- Left Sidebar: Exercise Sequence Steps (Cols 1-4) -->
-      <div class="lg:col-span-4 mimo-card p-5 border-[#363e66] bg-[#1c2038] shadow-xl space-y-4">
-        <div class="flex items-center justify-between pb-3 border-b border-[#2d3458]">
-          <h3 class="text-sm font-extrabold text-white uppercase tracking-wider flex items-center gap-2">
-            <i class="pi pi-list text-purple-400 text-xs"></i>
+      <div class="lg:col-span-4 study-card p-5 border-[#dce1d9] bg-[#ffffff] shadow-none space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-[#dce1d9]">
+          <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+            <i class="pi pi-list text-sky-800 text-sm"></i>
             <span>Desafios da Lista</span>
           </h3>
-          <span class="text-xs text-purple-300 font-mono font-bold">
-            {{ (currentStep + 1) }}/{{ lista?.exercicios?.length || 0 }}
+          <span class="text-sm text-sky-800 font-mono font-semibold">
+            {{ currentStep + 1 }}/{{ lista?.exercicios?.length || 0 }}
           </span>
         </div>
 
-        <!-- Exercise Step List -->
         <div class="space-y-2 max-h-[580px] overflow-y-auto pr-1">
-          <div 
-            v-for="(exercicio, index) in lista?.exercicios" 
+          <div
+            v-for="(exercicio, index) in lista?.exercicios"
             :key="index"
-            @click="exercicio.data.habilitado && (currentStep = index, exercicioSelecionado(exercicio.data))"
-            class="p-3.5 rounded-xl border transition-all duration-200 flex items-center justify-between gap-3"
+            @click="
+              exercicio.data.habilitado &&
+                ((currentStep = index), exercicioSelecionado(exercicio.data))
+            "
+            class="p-3.5 rounded-lg border transition-all duration-200 flex items-center justify-between gap-3"
             :class="[
-              currentStep === index 
-                ? 'bg-[#7c4ed4]/20 border-[#7c4ed4] text-white font-bold shadow-md shadow-purple-500/10' 
-                : exercicio.data.habilitado 
-                  ? 'bg-[#15172a] border-[#2d3458] hover:border-[#424c7e] text-slate-200 cursor-pointer' 
-                  : 'bg-[#121422] border-[#232742] text-slate-500 cursor-not-allowed opacity-60'
+              currentStep === index
+                ? 'bg-[#285b75]/20 border-[#285b75] text-slate-800 font-semibold shadow-md shadow-purple-500/10'
+                : exercicio.data.habilitado
+                ? 'bg-[#ffffff] border-[#dce1d9] hover:border-[#dce1d9] text-slate-700 cursor-pointer'
+                : 'bg-[#ffffff] border-[#dce1d9] text-slate-500 cursor-not-allowed opacity-60',
             ]"
           >
             <div class="flex items-center gap-3 truncate">
-              <span 
-                class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-mono font-bold shrink-0"
-                :class="currentStep === index ? 'bg-[#7c4ed4] text-white' : 'bg-[#222742] text-slate-400'"
+              <span
+                class="w-6 h-6 rounded-lg flex items-center justify-center text-sm font-mono font-semibold shrink-0"
+                :class="
+                  currentStep === index ? 'bg-[#285b75] text-white' : 'bg-[#ffffff] text-slate-600'
+                "
               >
                 {{ index + 1 }}
               </span>
-              <span class="text-xs truncate">
+              <span class="text-sm truncate">
                 {{ exercicio.data.name }}
               </span>
             </div>
 
-            <span class="shrink-0 text-xs">
+            <span class="shrink-0 text-sm">
               <i v-if="!exercicio.data.habilitado" class="pi pi-lock text-slate-500"></i>
-              <i v-else-if="currentStep === index" class="pi pi-play text-purple-400"></i>
-              <i v-else class="pi pi-check-circle text-emerald-400"></i>
+              <i v-else-if="currentStep === index" class="pi pi-play text-sky-800"></i>
+              <i v-else class="pi pi-check-circle text-emerald-700"></i>
             </span>
           </div>
         </div>
       </div>
 
-      <!-- Right Main: Monaco Editor Workstation (Cols 5-12) -->
       <div class="lg:col-span-8">
-        <ExercicioQuestao 
-          :exercicio="exercicioSelecionada" 
-          @call-back-atualizar-lista="atualizarLista" 
-          callBackSubmitText="Submeter Código"  
+        <ExercicioQuestao
+          :exercicio="exercicioSelecionada"
+          @call-back-atualizar-lista="atualizarLista"
+          callBackSubmitText="Testar minha solução"
           @show-toast="showToastFeedBack"
         />
       </div>
-
     </div>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import type { Listas, PrimeVueDataExercicio } from '~/types';
@@ -112,7 +111,7 @@ const showToastFeedBack = async (e: PrimeVueDataExercicio) => {
     } else {
       toast.add({ severity: 'error', summary: 'Erro', detail: "Não foi possível obter o feedback no momento.", life: 3000 });
     }
-  } catch (error) {    
+  } catch (error) {
     console.log(error);
   }
 };

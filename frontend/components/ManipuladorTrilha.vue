@@ -1,104 +1,123 @@
 <template>
-  <Dialog 
-    :visible="modelValue" 
-    @update:visible="(value) => $emit('update:modelValue', value)" 
+  <Dialog
+    :visible="modelValue"
+    @update:visible="(value) => $emit('update:modelValue', value)"
     modal
     :header="isUpdate ? 'Editar Trilha de Aprendizado' : 'Adicionar Nova Trilha'"
     :style="{ width: '32rem', maxWidth: '95vw' }"
-    class="mimo-dialog"
+    class="study-dialog"
   >
     <Toast />
     <ConfirmDialog />
 
-    <Form 
-      v-slot="$form" 
-      :initialValues="valoresIniciais" 
-      :resolver="resolver" 
-      @submit="onFormSubmit" 
+    <Form
+      v-slot="$form"
+      :initialValues="valoresIniciais"
+      :resolver="resolver"
+      @submit="onFormSubmit"
       class="flex flex-col gap-5 pt-2"
     >
-      <!-- Título da Trilha -->
       <div class="flex flex-col gap-1.5">
-        <label class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-          <i class="pi pi-tag text-purple-400 text-xs"></i>
+        <label class="text-sm font-semibold text-slate-600 flex items-center gap-1.5">
+          <i class="pi pi-tag text-sky-800 text-sm"></i>
           <span>Título da Trilha</span>
         </label>
-        <InputText 
-          name="titulo_trilha" 
-          v-model="valoresIniciais.titulo_trilha" 
-          type="text" 
-          placeholder="Ex: Introdução a Algoritmos em Python" 
-          class="w-full !p-3 !bg-[#15172a] !border-[#363e66] focus:!border-[#7c4ed4] rounded-xl text-sm"
-          fluid 
+        <InputText
+          name="titulo_trilha"
+          v-model="valoresIniciais.titulo_trilha"
+          type="text"
+          placeholder="Ex: Introdução a Algoritmos em Python"
+          class="w-full !p-3 !bg-[#ffffff] !border-[#dce1d9] focus:!border-[#285b75] rounded-lg text-sm"
+          fluid
         />
-        <Message v-if="$form.titulo_trilha?.invalid" severity="error" size="small" variant="simple" class="!text-xs !text-rose-400 mt-1">
+        <Message
+          v-if="$form.titulo_trilha?.invalid"
+          severity="error"
+          size="small"
+          variant="simple"
+          class="!text-sm !text-rose-700 mt-1"
+        >
           {{ $form.titulo_trilha.error?.message }}
         </Message>
       </div>
 
-      <!-- Tipo da Linguagem (Golang vs Python) -->
       <div class="flex flex-col gap-2">
-        <label class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-          <i class="pi pi-code text-purple-400 text-xs"></i>
+        <label class="text-sm font-semibold text-slate-600 flex items-center gap-1.5">
+          <i class="pi pi-code text-sky-800 text-sm"></i>
           <span>Linguagem de Programação</span>
         </label>
 
-        <RadioButtonGroup name="tipo_da_linguagem" v-model="valoresIniciais.tipo_da_linguagem" class="grid grid-cols-2 gap-3">
-          <div 
-            @click="valoresIniciais.tipo_da_linguagem = 1" 
-            class="p-4 rounded-xl border cursor-pointer transition-all flex items-center gap-3.5"
-            :class="valoresIniciais.tipo_da_linguagem === 1 ? 'bg-cyan-500/20 border-cyan-400 shadow-md shadow-cyan-500/10' : 'bg-[#15172a] border-[#363e66] hover:border-[#4f598c]'"
+        <RadioButtonGroup
+          name="tipo_da_linguagem"
+          v-model="valoresIniciais.tipo_da_linguagem"
+          class="grid grid-cols-2 gap-3"
+        >
+          <div
+            @click="valoresIniciais.tipo_da_linguagem = 1"
+            class="p-4 rounded-lg border cursor-pointer transition-all flex items-center gap-3.5"
+            :class="
+              valoresIniciais.tipo_da_linguagem === 1
+                ? 'bg-cyan-500/20 border-cyan-400 shadow-md shadow-cyan-500/10'
+                : 'bg-[#ffffff] border-[#dce1d9] hover:border-[#dce1d9]'
+            "
           >
             <RadioButton inputId="lang-go" :value="1" class="hidden" />
-            <span class="w-9 h-9 rounded-xl bg-cyan-500/20 text-cyan-300 flex items-center justify-center font-extrabold text-xs">
+            <span
+              class="w-9 h-9 rounded-lg bg-cyan-500/20 text-sky-800 flex items-center justify-center font-semibold text-sm"
+            >
               Go
             </span>
             <div>
-              <div class="text-sm font-bold text-white">Golang</div>
-              <div class="text-[11px] text-slate-400">Compilada</div>
+              <div class="text-sm font-semibold text-slate-800">Golang</div>
+              <div class="text-[11px] text-slate-600">Compilada</div>
             </div>
           </div>
 
-          <div 
-            @click="valoresIniciais.tipo_da_linguagem = 2" 
-            class="p-4 rounded-xl border cursor-pointer transition-all flex items-center gap-3.5"
-            :class="valoresIniciais.tipo_da_linguagem === 2 ? 'bg-amber-400/20 border-amber-400 shadow-md shadow-amber-500/10' : 'bg-[#15172a] border-[#363e66] hover:border-[#4f598c]'"
+          <div
+            @click="valoresIniciais.tipo_da_linguagem = 2"
+            class="p-4 rounded-lg border cursor-pointer transition-all flex items-center gap-3.5"
+            :class="
+              valoresIniciais.tipo_da_linguagem === 2
+                ? 'bg-amber-400/20 border-amber-400 shadow-md shadow-amber-500/10'
+                : 'bg-[#ffffff] border-[#dce1d9] hover:border-[#dce1d9]'
+            "
           >
             <RadioButton inputId="lang-py" :value="2" class="hidden" />
-            <span class="w-9 h-9 rounded-xl bg-amber-400/20 text-amber-300 flex items-center justify-center font-extrabold text-xs">
+            <span
+              class="w-9 h-9 rounded-lg bg-amber-400/20 text-amber-800 flex items-center justify-center font-semibold text-sm"
+            >
               Py
             </span>
             <div>
-              <div class="text-sm font-bold text-white">Python</div>
-              <div class="text-[11px] text-slate-400">Interpretada</div>
+              <div class="text-sm font-semibold text-slate-800">Python</div>
+              <div class="text-[11px] text-slate-600">Interpretada</div>
             </div>
           </div>
         </RadioButtonGroup>
 
-        <Message v-if="$form.tipo_da_linguagem?.invalid" severity="error" size="small" variant="simple" class="!text-xs !text-rose-400 mt-1">
+        <Message
+          v-if="$form.tipo_da_linguagem?.invalid"
+          severity="error"
+          size="small"
+          variant="simple"
+          class="!text-sm !text-rose-700 mt-1"
+        >
           {{ $form.tipo_da_linguagem.error?.message }}
         </Message>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="flex items-center justify-end gap-3 pt-3 border-t border-[#2d3458]">
-        <button 
-          type="button" 
-          @click="closeDialog" 
-          class="mimo-btn-secondary px-4 py-2 text-xs"
-        >
+      <div class="flex items-center justify-end gap-3 pt-3 border-t border-[#dce1d9]">
+        <button type="button" @click="closeDialog" class="study-btn-secondary px-4 py-2 text-sm">
           Cancelar
         </button>
-        <button 
-          type="submit" 
-          class="mimo-btn-primary px-5 py-2 text-xs"
-        >
-          {{ isUpdate ? 'Salvar Alterações' : 'Criar Trilha' }}
+        <button type="submit" class="study-btn-primary px-5 py-2 text-sm">
+          {{ isUpdate ? "Salvar Alterações" : "Criar Trilha" }}
         </button>
       </div>
     </Form>
   </Dialog>
 </template>
+
 
 <script setup lang="ts">
 import Dialog from 'primevue/dialog';
@@ -162,7 +181,7 @@ watch(
 const onFormSubmit = async ({ valid }: { valid: boolean }) => {
   if (valid) {
     const config = useRuntimeConfig();
-    
+
     if (props.isUpdate) {
       try {
         const response = await fetch(config.public.BACKEND_API_URL + '/v1/update_trilha', {
