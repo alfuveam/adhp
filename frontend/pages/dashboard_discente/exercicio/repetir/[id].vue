@@ -1,212 +1,110 @@
 <template>
-  <div class="card flex justify-center">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
     <Toast />
-    <ConfirmDialog></ConfirmDialog>
-
-    <Form v-slot="$form" :initialValues :resolver @submit="onFormSubmit" class="flex flex-col gap-4 w-2/3 sm:w-2/3">
-      <div class="flex flex-col gap-1">
-        <label for="multiple-ac-1" class="font-bold mb-2 block">Título exercício</label>
-        <p>
-          {{exercicio.name}}
-        </p>
-      </div>
-      <div class="flex flex-col gap-1">
-        <div class="card flex justify-between">
-          <label for="multiple-ac-1" class="font-bold block">Código para Submeter</label>
-          <Button class="mb-2" label="Solicitar feedback" @click="showFeedback(exercicio)" />
-        </div>
-        <MonacoEditor name="codigo_base" v-model="exercicio.codigo_base" :options="optionsEditor" :lang="tipoDaLinguagem == 1 ? 'go' : 'python'" class="h-[600px] z-10" />
-        <!-- <Editor v-model="exercicio.codigo_base" editorStyle="height: 220px" spellcheck="false" ref="refQuillCodigoBase">
-          <template v-slot:toolbar>
-            <span class="ql-formats">
-              <button v-tooltip.bottom="'Bold'" class="ql-bold"></button>
-              <button v-tooltip.bottom="'Italic'" class="ql-italic"></button>
-              <button v-tooltip.bottom="'Underline'" class="ql-underline"></button>
-            </span>
-          </template>
-        </Editor> -->
-
-      </div>
-      <div class="flex flex-col gap-1">
-        <label for="multiple-ac-1" class="font-bold mb-2 block">Retorno da execução</label>
-        <Textarea v-model="retorno_codigo" rows="5" cols="40" />
-      </div>
-      <div class="flex flex-col gap-1">
-        <label for="multiple-ac-1" class="font-bold mb-2 block">Retorno do Teste</label>
-        <Textarea v-model="retorno_teste" rows="5" cols="40" />
-      </div>
-      <Button type="submit" severity="secondary" label="Enviar" />
-    </Form>
+    <NuxtLink to="/dashboard_discente" class="inline-flex items-center gap-2 text-sm text-sky-800"
+      ><i class="pi pi-arrow-left" aria-hidden="true"></i> Voltar aos meus estudos</NuxtLink
+    >
+    <h1 class="text-xl font-semibold">Hora de revisar</h1>
+    <p v-if="loading" role="status" class="study-card p-6">Carregando o exercício para revisão…</p>
+    <div v-else-if="loadError" role="alert" class="study-card p-6 space-y-3">
+      <p>{{ loadError }}</p>
+      <button type="button" class="study-btn-secondary px-4 py-2" @click="loadReview">
+        Tentar novamente
+      </button>
+    </div>
+    <ExercicioQuestao
+      v-else-if="exercise"
+      :exercicio="exercise"
+      :tipo-linguagem="language"
+      :repeticao-id="reviewId"
+      callBackSubmitText="Testar minha revisão"
+      @show-toast="showHint"
+      @call-back-atualizar-lista="completed = true"
+    />
+    <NuxtLink v-if="completed" to="/dashboard_discente" class="study-btn-secondary px-5 py-3"
+      >Revisão concluída · Voltar aos meus estudos</NuxtLink
+    >
   </div>
 </template>
-  
 <script setup lang="ts">
-import * as Monaco from 'monaco-editor'
-
-const optionsEditor = ref<Monaco.editor.IStandaloneEditorConstructionOptions>({
-  theme: 'vs-dark'
-});
-
-import { zodResolver } from '@primevue/forms/resolvers/zod';
-import { z } from 'zod';
-import type { PrimeVueDataExercicio, RetornoExecucao } from '~/types'
-import { reactive } from 'vue';
+import type { PrimeVueDataExercicio } from '~/types';
 import { useToast } from 'primevue/usetoast';
-
+definePageMeta({ middleware: 'auth-discente' });
 const route = useRoute();
-const toast = useToast();
 const { $authService } = useNuxtApp();
-let refQuillCodigoBase = ref(null)
-const exercicioIDRep = ref('')
-const tipoDaLinguagem = ref(0)
-
-const initialValues = reactive({
-    codigo_base: ''
-});
-
-const exercicio = ref<PrimeVueDataExercicio>({
-  name: '',
-  id: '',
-  inputValue: '',
-  type: 0,
-  codigo_rodou: false,
-  codigo_base: '',
-  habilitado: false,
-  order_index: 0,
-})
-
-const retorno_codigo = ref('')
-const retorno_teste = ref('')
-const codigoBaseToSend = ref('')
-
-const showFeedback = async (e: PrimeVueDataExercicio) => {
+const toast = useToast();
+const reviewId = computed(() => String(route.params.id || ''));
+const exercise = ref<PrimeVueDataExercicio | null>(null);
+const language = ref(0);
+const loading = ref(true);
+const loadError = ref('');
+const completed = ref(false);
+async function loadReview() {
+  loading.value = true;
+  loadError.value = '';
+  completed.value = false;
   try {
-    const config = useRuntimeConfig()
-    const response = await fetch(config.public.BACKEND_API_URL + '/v1/feedback_by_exercicio_id/'+e.id+'/'+config.public.METRICAS_FEEDBACK.REPETICAO, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + $authService.getToken()
+    const response = await fetch(
+      useRuntimeConfig().public.BACKEND_API_URL +
+        '/v1/discente_get_exerc_rep_espacada/' +
+        reviewId.value,
+      {
+        signal: AbortSignal.timeout(20000),
+        headers: { Authorization: 'Bearer ' + $authService.getToken() },
       }
-    })
-
-    if (response.ok) {
-      const data = await response.json()
-      toast.add({ severity: 'info', summary: 'Info', detail: data.feedback, life: 3000 });
-    } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: "Error ao requisitar o feedback", life: 3000 });
-    }
-  } catch (error) {    
-    console.log(error)
+    );
+    if (!response.ok) throw new Error('request');
+    const data = await response.json();
+    if (!data.exercicio?.id) throw new Error('response');
+    exercise.value = data.exercicio;
+    language.value = data.tipo_da_linguagem;
+    fetch(useRuntimeConfig().public.BACKEND_API_URL + '/v1/metricas_repeticao_espacada', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + $authService.getToken(),
+      },
+      body: JSON.stringify({
+        exercicio_id: data.exercicio.id,
+        tipo_metrica: useRuntimeConfig().public.METRICAS.INICIO,
+      }),
+    }).catch(() => {});
+  } catch {
+    loadError.value = 'Não foi possível carregar esta revisão. Tente novamente em instantes.';
+  } finally {
+    loading.value = false;
   }
-};
-
-const resolver = zodResolver(
-  z.object({
-    codigo_base: z.string().min(1, { message: 'Código base exercício é necessario.' })
-  })
-);
-
-const onFormSubmit = async ({ valid }: { valid: boolean }) => {
-  if (valid) {
+}
+async function showHint(item: PrimeVueDataExercicio) {
+  try {
+    const config = useRuntimeConfig();
+    const response = await fetch(
+      config.public.BACKEND_API_URL +
+        '/v1/feedback_by_exercicio_id/' +
+        item.id +
+        '/' +
+        config.public.METRICAS_FEEDBACK.REPETICAO,
+      {
+        signal: AbortSignal.timeout(20000),
+        headers: { Authorization: 'Bearer ' + $authService.getToken() },
+      }
+    );
+    if (!response.ok) throw new Error('request');
+    const data = await response.json();
     toast.add({
-      severity: 'success',
-      summary: 'Form foi enviado.',
-      life: 3000
+      severity: 'info',
+      summary: 'Uma dica para continuar',
+      detail: data.feedback || 'Este exercício ainda não tem uma dica disponível.',
+      life: 8000,
+    });
+  } catch {
+    toast.add({
+      severity: 'error',
+      summary: 'Não foi possível carregar a dica',
+      detail: 'Tente novamente em instantes.',
+      life: 4000,
     });
   }
-
-  if (useRuntimeConfig().public.USE_MONACO_EDITOR == "true") {
-    codigoBaseToSend.value = exercicio.value.codigo_base
-  } else {
-    // @ts-ignore
-    codigoBaseToSend.value = refQuillCodigoBase.value?.quill.getText()
-  }
-
-  try {
-    const response = await fetch(useRuntimeConfig().public.BACKEND_API_URL + '/v1/discente_submit_exerc_rep_espacada', {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + $authService.getToken()
-      },
-      body: JSON.stringify({
-        repeticao_espacada_id: exercicioIDRep.value,
-        exercicio_id: exercicio.value.id,
-        codigo_base: btoa(encodeURIComponent(codigoBaseToSend.value))
-      })
-    })
-
-    const exercicioResponse: RetornoExecucao = await response.json()
-    if (response.ok) {
-      retorno_codigo.value = exercicioResponse.out_put_from_user.output
-      retorno_teste.value = exercicioResponse.out_put_unit_teste.output
-
-      if (!exercicioResponse.out_put_unit_teste.success) {
-        retorno_teste.value = exercicioResponse.out_put_unit_teste.error
-      }
-      if (exercicioResponse.out_put_from_user.success && exercicioResponse.out_put_unit_teste.success) {
-        toast.add({ severity: 'success', summary: 'Exercício submetido com sucesso', life: 3000 });
-      }
-    } else {
-      retorno_codigo.value = exercicioResponse.out_put_from_user.error
-      retorno_teste.value = exercicioResponse.out_put_unit_teste.error
-      toast.add({ severity: 'error', summary: 'Error ao submeter o exercício', life: 3000 });
-    }
-  } catch(error) {
-    console.log(error)
-  }
-};
-
-const loadRepeticaoEspacadaExercicio = async () => {
-  // @ts-ignore
-  exercicioIDRep.value = route.params.id
-  try {
-    const response = await fetch(useRuntimeConfig().public.BACKEND_API_URL + '/v1/discente_get_exerc_rep_espacada/'+exercicioIDRep.value, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + $authService.getToken()
-      }
-    })
-
-    if (response.ok) {
-      const data = await response.json()
-      exercicio.value = data.exercicio
-      tipoDaLinguagem.value = data.tipo_da_linguagem
-      toast.add({ severity: 'success', summary: 'Exercício carregado.', life: 3000 });
-      await onSubmitMetricaExercicioInicio()
-    } else {
-      toast.add({ severity: 'error', summary: 'Error ao carregar o exercício.', life: 3000 });
-    }
-  } catch(error) {
-    console.log(error)
-  }
 }
-
-const onSubmitMetricaExercicioInicio = async () => {
-  try {
-    const response = await fetch(useRuntimeConfig().public.BACKEND_API_URL + '/v1/metricas_repeticao_espacada', {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + $authService.getToken()
-      },
-      body: JSON.stringify({
-        exercicio_id: exercicio.value.id,
-        tipo_metrica: useRuntimeConfig().public.METRICAS.INICIO
-      })
-    })
-
-    if (response.ok) {
-      console.log("Métrica da repetição enviada com sucesso")
-    } else {
-      console.log("Erro ao enviar a métrica da repetição")
-    }
-  } catch (error) {
-    console.log(error)
-  }
-}
-
-loadRepeticaoEspacadaExercicio()
+onMounted(loadReview);
 </script>

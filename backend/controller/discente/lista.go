@@ -43,41 +43,13 @@ func ExerciciosHabilitadosByLista(w http.ResponseWriter, r *http.Request, q *gen
 		CreatedByUserID: uuidUser,
 	})
 
-	var listasDashboard []models.ListaDashboardDiscente
-	var exerciciosDashboard []models.ExercicioDashboardDiscente
-
-	for indexExerc, exercicio := range exercicios {
-		exercicioFoundDiscente := false
-
-		for _, exercicioDiscente := range exerciciosDiscente {
-			if exercicio.ID == exercicioDiscente.ExerciciosBaseID {
-				exerciciosDashboard = append(exerciciosDashboard, models.ExercicioDashboardDiscente{
-					Key: string(rune(indexExerc)),
-					Data: models.ExercicioDataDiscente{
-						Name:        exercicio.Titulo,
-						Id:          exercicio.ID.String(),
-						CodigoRodou: exercicioDiscente.CodigoRodou,
-						Habilitado:  exercicioDiscente.Habilitado,
-						CodigoBase:  exercicioDiscente.CodigoBase,
-					},
-				})
-				exercicioFoundDiscente = true
-			}
-		}
-
-		if !exercicioFoundDiscente {
-			exerciciosDashboard = append(exerciciosDashboard, models.ExercicioDashboardDiscente{
-				Key: string(rune(indexExerc)),
-				Data: models.ExercicioDataDiscente{
-					Name:        exercicio.Titulo,
-					Id:          exercicio.ID.String(),
-					CodigoRodou: false,
-					Habilitado:  false,
-					CodigoBase:  "",
-				},
-			})
-		}
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Erro ao buscar o progresso"})
+		return
 	}
+	var listasDashboard []models.ListaDashboardDiscente
+	exerciciosDashboard := studentExercises(exercicios, exerciciosDiscente, true)
 
 	listasDashboard = append(listasDashboard, models.ListaDashboardDiscente{
 		Name:       "-",

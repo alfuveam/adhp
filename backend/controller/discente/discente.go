@@ -62,54 +62,12 @@ func DashboardDiscente(w http.ResponseWriter, r *http.Request, q *generated.Quer
 				CreatedByUserID: uuidUser,
 			})
 
-			var exerciciosDashboard []models.ExercicioDashboardDiscente
-
-			for indexExerc, exercicio := range exercicios {
-				exercicioFoundDiscente := false
-				if exercicio.OrderIndex == 1 {
-					// Enable every first exercise
-					exerciciosDashboard = append(exerciciosDashboard, models.ExercicioDashboardDiscente{
-						Key: string(rune(indexExerc)),
-						Data: models.ExercicioDataDiscente{
-							Name:        exercicio.Titulo,
-							Id:          exercicio.ID.String(),
-							CodigoRodou: false,
-							Habilitado:  true,
-							OrderIndex:  exercicio.OrderIndex,
-						},
-					})
-					continue
-				}
-
-				for _, exercicioDiscente := range exerciciosDiscente {
-					if exercicio.ID == exercicioDiscente.ExerciciosBaseID {
-						exerciciosDashboard = append(exerciciosDashboard, models.ExercicioDashboardDiscente{
-							Key: string(rune(indexExerc)),
-							Data: models.ExercicioDataDiscente{
-								Name:        exercicio.Titulo,
-								Id:          exercicio.ID.String(),
-								CodigoRodou: exercicioDiscente.CodigoRodou,
-								Habilitado:  exercicioDiscente.Habilitado,
-								OrderIndex:  exercicio.OrderIndex,
-							},
-						})
-						exercicioFoundDiscente = true
-					}
-				}
-
-				if !exercicioFoundDiscente {
-					exerciciosDashboard = append(exerciciosDashboard, models.ExercicioDashboardDiscente{
-						Key: string(rune(indexExerc)),
-						Data: models.ExercicioDataDiscente{
-							Name:        exercicio.Titulo,
-							Id:          exercicio.ID.String(),
-							CodigoRodou: false,
-							Habilitado:  false,
-							OrderIndex:  exercicio.OrderIndex,
-						},
-					})
-				}
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				json.NewEncoder(w).Encode(map[string]string{"error": "Erro ao buscar o progresso"})
+				return
 			}
+			exerciciosDashboard := studentExercises(exercicios, exerciciosDiscente, false)
 
 			listasDashboard = append(listasDashboard, models.ListaDashboardDiscente{
 				Name:       lista.Name,

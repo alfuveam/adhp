@@ -1,81 +1,95 @@
 <template>
-  <div class="bg-zinc-900 min-h-screen text-gray-100">
-    <header>
-      <div class="w-full h-14 bg-zinc-950">
-        <div class="p-1 flex justify-between">
-          <NuxtLink to="/" class="flex flex-center">
-            <img src="~/assets/images/logo_adhp.webp" class="h-12 w-12 rounded-lg object-cover" alt="ADHP Logo">
-            <span class="justify-center text-3xl font-bold text-gray-300 p-1">ADHP</span>
-          </NuxtLink>
-          <div></div>
-          <div v-if="!isAuthenticated" class="flex flex-center justify-between p-3">
-            <NuxtLink to="/account/login" class="mr-4">Entrar</NuxtLink>
-            <NuxtLink to="/account/createaccount">Criar Conta</NuxtLink>
-          </div>
-          <div v-else class="flex flex-center justify-between p-3">
-            <button @click="dashboardRedirec" class="mr-4">Dashboard</button>
-            <button @click="logout" class="mr-4">Logout</button>
-          </div>
-        </div>
+  <div class="site-shell">
+    <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+    <header class="site-header">
+      <div class="site-nav">
+        <NuxtLink to="/" class="site-brand" aria-label="ADHP — início">
+          <img src="/icon.svg" alt="" width="38" height="38" />
+          <span
+            >ADHP<span class="brand-dot">.</span
+            ><small>Um espaço para aprender programação</small></span
+          >
+        </NuxtLink>
+        <nav aria-label="Navegação principal" class="site-links">
+          <NuxtLink to="/#metodologia">Como funciona</NuxtLink>
+          <NuxtLink to="/#trilhas">Exercícios</NuxtLink>
+          <template v-if="!isAuthenticated">
+            <NuxtLink to="/account/login">Entrar</NuxtLink>
+            <NuxtLink to="/account/createaccount" class="button">Criar conta</NuxtLink>
+          </template>
+          <template v-else>
+            <button class="button" @click="dashboardRedirec">Meus estudos</button>
+            <button class="nav-logout" @click="logout">Sair</button>
+          </template>
+        </nav>
       </div>
     </header>
-
-    <div class="w-full min-h-screen p-2">
-      <slot />
-    </div>
-
-    <footer>
-      <div class="w-full h-24 bg-zinc-950">
-        <div class="flex justify-between">
-            <div></div>
-            <div class="flex justify-between p-3">
-              <div class="p-3"></div>
-              <NuxtLink to="/sitemap">Sitemap</NuxtLink>
-            </div>
-        </div>
-        <hr class="ml-4 mr-4 border-gray-600"/>
-        <div class="flex justify-center mt-2">ADHP - Todos os direitos reservados</div>
+    <main id="conteudo" class="site-main"><slot /></main>
+    <footer class="site-footer">
+      <div>
+        <span>ADHP · Ambiente para o Desenvolvimento de Habilidades em Programação</span>
       </div>
+      <NuxtLink to="/sitemap">Mapa do site</NuxtLink>
     </footer>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, watch, onMounted } from 'vue';
 
-import { watch } from 'vue';
-const isAuthenticated = ref(false)
+const isAuthenticated = ref(false);
+const userRole = ref<string | null>(null);
 const route = useRoute();
-
 const { $authService } = useNuxtApp();
 
 const dashboardRedirec = () => {
   if ($authService.isDocente()) {
-    navigateTo("/dashboard_docente")
+    navigateTo("/dashboard_docente");
   } else if ($authService.isDiscente()) {
-    navigateTo("/dashboard_discente")
+    navigateTo("/dashboard_discente");
   }
-}
+};
 
 const logout = () => {
-  navigateTo("/account/login")
   $authService.logout();
-}
+  isAuthenticated.value = false;
+  userRole.value = null;
+  navigateTo("/account/login");
+};
 
 const checkIsAuthenticated = () => {
   if ($authService.isAuthenticated()) {
-    const jwtPayload = $authService.parseJwt($authService.getToken() || '');
-    if (jwtPayload.exp < Date.now() / 1000) {
-      $authService.logout();
+    const token = $authService.getToken() || '';
+    try {
+      const jwtPayload = $authService.parseJwt(token);
+      if (jwtPayload && jwtPayload.exp && jwtPayload.exp < Date.now() / 1000) {
+        $authService.logout();
+      }
+    } catch {
+      // ignore parse error
     }
   }
-  isAuthenticated.value = $authService.isAuthenticated();
-}
 
-watch(route, (to, from) => {
-  checkIsAuthenticated()
+  const isAuth = $authService.isAuthenticated();
+  isAuthenticated.value = isAuth;
+  if (isAuth) {
+    if ($authService.isDocente()) {
+      userRole.value = 'Docente';
+    } else if ($authService.isDiscente()) {
+      userRole.value = 'Discente';
+    } else {
+      userRole.value = 'Usuário';
+    }
+  } else {
+    userRole.value = null;
+  }
+};
+
+watch(route, () => {
+  checkIsAuthenticated();
 });
 
 onMounted(() => {
-  checkIsAuthenticated()
-})
+  checkIsAuthenticated();
+});
 </script>
