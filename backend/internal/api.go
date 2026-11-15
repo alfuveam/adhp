@@ -39,6 +39,14 @@ func (s *APIServer) Run() error {
 		controller.RegisterUser(w, r, s.queries)
 	})
 
+	router.HandleFunc("POST /v1/recovery/request", func(w http.ResponseWriter, r *http.Request) {
+		controller.RequestPasswordRecovery(w, r, s.queries)
+	})
+
+	router.HandleFunc("POST /v1/recovery/reset", func(w http.ResponseWriter, r *http.Request) {
+		controller.ResetPassword(w, r, s.queries)
+	})
+
 	loggedRouter := http.NewServeMux()
 	loggedRouter.HandleFunc("POST /v1/logout", func(w http.ResponseWriter, r *http.Request) {
 		controller.OnLogout(w, r, s.db)
@@ -290,7 +298,7 @@ func AdminRequereMiddleware(next http.Handler) http.HandlerFunc {
 		}
 
 		if user.UserType != 3 {
-			log.Println("AdminRequereMiddleware error in elevated type: %v - %v", user.Id, user.UserType)
+			log.Printf("AdminRequereMiddleware error in elevated type: %v - %v", user.Id, user.UserType)
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(map[string]string{
 				"error": "Invalid user elevated type",
@@ -316,7 +324,7 @@ func DocenteRequereMiddleware(next http.Handler) http.HandlerFunc {
 
 		// ??
 		if (user.UserType < 2) == true {
-			log.Println("DocenteRequereMiddleware error in elevated type: %v - %v", user.Id, user.UserType)
+			log.Printf("DocenteRequereMiddleware error in elevated type: %v - %v", user.Id, user.UserType)
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(map[string]string{
 				"error": "Invalid user elevated type",

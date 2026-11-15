@@ -12,6 +12,7 @@ import (
 
 	"github.com/alfuveam/adhp/backend/config"
 	"github.com/alfuveam/adhp/backend/generated"
+	"github.com/alfuveam/adhp/backend/internal/turnstile"
 	"github.com/alfuveam/adhp/backend/models"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -38,6 +39,12 @@ type MyCustomClaims struct {
 
 type ErroOnLogin struct {
 	Error string `json:"error_on_login"`
+}
+
+// AuthRequest é o payload de login/cadastro com o token do Turnstile.
+type AuthRequest struct {
+	generated.User
+	TurnstileToken string `json:"turnstile_token"`
 }
 
 type DashboardResponse struct {
@@ -83,14 +90,20 @@ func CreateAndSignJWT(userJWT *models.UserJwt) (string, error) {
 }
 
 func OnLogin(w http.ResponseWriter, r *http.Request, q *generated.Queries) {
-	var req generated.User
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	var body AuthRequest
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(ErroOnLogin{
 			Error: "Requisição com payload inválido",
 		})
 		return
 	}
+	if !turnstile.Verify(body.TurnstileToken) {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ErroOnLogin{Error: msgTurnstileRequired})
+		return
+	}
+	req := body.User
 
 	user, err := q.OnLoginCheckEmailAndPasswordUser(context.Background(), req.Email)
 
@@ -143,14 +156,20 @@ func OnLogout(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 }
 
 func RegisterUser(w http.ResponseWriter, r *http.Request, q *generated.Queries) {
-	var req generated.User
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	var body AuthRequest
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(ErroOnLogin{
 			Error: "Requisição com payload inválido",
 		})
 		return
 	}
+	if !turnstile.Verify(body.TurnstileToken) {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ErroOnLogin{Error: msgTurnstileRequired})
+		return
+	}
+	req := body.User
 
 	var errorRes ErrorResponseCreateAccount
 	hasError := false
@@ -187,7 +206,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request, q *generated.Queries) 
 	req.Password = config.SaltDB + req.Password
 	bytes, err := bcrypt.GenerateFromPassword([]byte(req.Password), 14)
 	if err != nil {
-		log.Println("bcrypt.GenerateFromPassword: %v", err)
+		log.Printf("bcrypt.GenerateFromPassword: %v", err)
 		errorRes.OnCreateAccount = "Erro ao criar a conta, entre em contato com o administrador."
 		hasError = true
 	}
@@ -220,7 +239,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request, q *generated.Queries) 
 
 	user, err := q.CreateUser(context.Background(), createUser)
 	if err != nil {
-		log.Println("req.CreateUser: %v", err)
+		log.Printf("req.CreateUser: %v", err)
 		errorRes.OnCreateAccount = "Erro ao criar a conta, entre em contato com o administrador.."
 		hasError = true
 	}

@@ -199,6 +199,8 @@
           </Message>
         </div>
 
+        <TurnstileWidget ref="turnstileRef" v-model="turnstileToken" />
+
         <button
           type="submit"
           :disabled="submitting"
@@ -231,6 +233,8 @@ import { useToast } from 'primevue/usetoast';
 const { $authService } = useNuxtApp();
 const toast = useToast();
 const submitting = ref(false);
+const turnstileToken = ref('');
+const turnstileRef = ref<{ reset: () => void } | null>(null);
 
 interface LoginToken {
   token: string;
@@ -265,11 +269,16 @@ const resolver = zodResolver(
 
 const onFormSubmit = async (e: any) => {
   if (!e.valid || submitting.value) return;
+  if (!turnstileToken.value) {
+    toast.add({ severity: 'warn', summary: 'Confirme a verificação de segurança', life: 3000 });
+    return;
+  }
   submitting.value = true;
   try {
     await createAccount();
   } finally {
     submitting.value = false;
+    turnstileRef.value?.reset();
   }
 };
 
@@ -291,6 +300,7 @@ async function createAccount() {
         email: initialValues.value.email,
         repeticao_espacada_minutos: Number(initialValues.value.repeticao_espacada_minutos),
         password: initialValues.value.password,
+        turnstile_token: turnstileToken.value,
       }),
     });
 
@@ -317,6 +327,8 @@ async function createAccount() {
         errorData.error_email ||
         errorData.error_password ||
         errorData.error_repeticao_espacada_minutos ||
+        errorData.error_on_create_account ||
+        errorData.error_on_login ||
         errorData.error ||
         'Verifique os dados informados.';
 

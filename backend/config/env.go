@@ -16,4 +16,14 @@ var (
 	CodeHandlerApiUrl = os.Getenv("CODE_HANDLER_API_URL")
 	CodeHandlerKey    = os.Getenv("CODE_HANDLER_KEY")
 	CorsOrigin        = os.Getenv("CORS_ORIGIN")
+
+	// Cloudflare Turnstile. Vazio (ou a chave de teste) desativa a verificação.
+	TurnstileSecret = os.Getenv("TURNSTILE_SECRET")
+
+	// SMTP para os e-mails de recuperação de senha.
+	SmtpHost = os.Getenv("SMTP_HOST")
+	SmtpPort = os.Getenv("SMTP_PORT")
+	SmtpUser = os.Getenv("SMTP_USER")
+	SmtpPass = os.Getenv("SMTP_PASS")
+	SmtpFrom = os.Getenv("SMTP_FROM")
 )

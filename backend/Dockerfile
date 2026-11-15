@@ -15,6 +15,8 @@ FROM scratch
 WORKDIR /app
 
 COPY --from=builder /bin/adhp .
+# scratch não tem certificados CA: necessários para o TLS do SMTP e do Turnstile
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 EXPOSE 8301
 

@@ -17,3 +17,8 @@
     SET repeticao_espacada_minutos = $2
     WHERE id = $1
     RETURNING *;
+
+-- name: UpdateUserPassword :exec
+    UPDATE users
+    SET password = $2
+    WHERE id = $1;

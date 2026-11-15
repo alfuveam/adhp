@@ -11,16 +11,21 @@ services:
       DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_USER: ${DATABASE_USER}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      # porta/host da rede interna do docker (5439 é só o mapeamento no host)
+      # banco pg-adhp (TFS-RUST-Many/tools/databases) na rede adhp; 5497 é só a porta no host
       DATABASE_PORT: 5432
-      DATABASE_HOST: db_adhp
+      DATABASE_HOST: pg-adhp
       CODE_HANDLER_API_URL: http://code_handler:8302
       CODE_HANDLER_KEY: ${CODE_HANDLER_KEY}
       SALTDB: ${SALTDB}
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
       MY_SIGNING_KEY: ${MY_SIGNING_KEY}
+      TURNSTILE_SECRET: ${TURNSTILE_SECRET:-}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
     depends_on:
-      - db_adhp
       - pgadmin
     networks:
       - adhp
@@ -35,6 +40,7 @@ services:
       - "5190:5190"
       - "24678:24678"
     environment:
+      NUXT_PUBLIC_TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-1x00000000000000000000AA}
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
     volumes:
       - ./frontend:/app
@@ -65,26 +71,10 @@ services:
     networks:
       - adhp
 
-  db_adhp:
-    image: "postgres:16"
-    restart: unless-stopped
-    ports:
-      - 5439:5432
-    environment:
-      POSTGRES_USER: ${DATABASE_USER}
-      POSTGRES_DB: ${DATABASE_NAME}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-    volumes:
-      - db_adhp:/var/lib/postgresql/data
-    networks:
-      - adhp
-
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: pgadmin-adhp
     restart: unless-stopped
-    depends_on:
-      - db_adhp
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
@@ -96,8 +86,6 @@ services:
       - adhp
 
 volumes:
-  db_adhp:
-    driver: local
   pgadmin:
     driver: local
   codes:

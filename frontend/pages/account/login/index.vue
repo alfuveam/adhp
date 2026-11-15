@@ -72,6 +72,14 @@
           </Message>
         </div>
 
+        <div class="flex justify-end -mt-1">
+          <NuxtLink to="/account/recovery" class="text-sm font-semibold text-sky-800 hover:text-sky-900">
+            Esqueci minha senha
+          </NuxtLink>
+        </div>
+
+        <TurnstileWidget ref="turnstileRef" v-model="turnstileToken" />
+
         <button
           type="submit"
           :disabled="submitting"
@@ -107,6 +115,8 @@ import { useToast } from 'primevue/usetoast';
 const { $authService } = useNuxtApp();
 const toast = useToast();
 const submitting = ref(false);
+const turnstileToken = ref('');
+const turnstileRef = ref<{ reset: () => void } | null>(null);
 
 interface LoginToken {
   token: string;
@@ -123,17 +133,22 @@ const resolver = zodResolver(
     password: z
       .string()
       .min(3, { message: 'Mínimo de 3 caracteres.' })
-      .max(15, { message: 'Máximo de 15 caracteres.' }),
+      .max(100, { message: 'Máximo de 100 caracteres.' }),
   })
 );
 
 const onFormSubmit = async (e: any) => {
   if (!e.valid || submitting.value) return;
+  if (!turnstileToken.value) {
+    toast.add({ severity: 'warn', summary: 'Confirme a verificação de segurança', life: 3000 });
+    return;
+  }
   submitting.value = true;
   try {
     await sendLogin();
   } finally {
     submitting.value = false;
+    turnstileRef.value?.reset();
   }
 };
 
@@ -148,6 +163,7 @@ async function sendLogin() {
       body: JSON.stringify({
         email: initialValues.value.email,
         password: initialValues.value.password,
+        turnstile_token: turnstileToken.value,
       }),
     });
 
@@ -166,10 +182,13 @@ async function sendLogin() {
         }
       }
     } else {
+      const errorData = await response.json().catch(() => ({}));
       toast.add({
         severity: 'error',
         summary: 'Falha no login',
-        detail: 'Verifique seu e-mail e senha.',
+        detail: errorData.error_on_login === 'Invalid user' || errorData.error_on_login === 'Invalid password' || !errorData.error_on_login
+          ? 'Verifique seu e-mail e senha.'
+          : errorData.error_on_login,
         life: 3000,
       });
     }

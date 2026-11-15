@@ -51,6 +51,8 @@ export default defineNuxtConfig({
       USER_TYPE_DISCENTE: process.env.NUXT_PUBLIC_DISCENTE,
       USER_TYPE_DOCENTE: process.env.NUXT_PUBLIC_DOCENTE,
       USE_MONACO_EDITOR: process.env.NUXT_USE_MONACO_EDITOR,
+      // sobrescrito em runtime por NUXT_PUBLIC_TURNSTILE_SITE_KEY; padrão = chave de teste
+      TURNSTILE_SITE_KEY: '1x00000000000000000000AA',
       METRICAS: {
         INICIO: 1,
         TENTOU: 2,
